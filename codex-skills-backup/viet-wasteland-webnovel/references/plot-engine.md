@@ -344,3 +344,124 @@ Mỗi loài thú biến dị cần 6 ô:
 6. **Rủi ro xử lý**: thịt không ăn được, máu ăn mòn, lông gây sốt, lõi kéo faction tới.
 
 Thú hay nhất không chỉ để giết. Nó phải làm lộ luật thế giới và làm thay đổi quan hệ con người.
+
+## 15. Engine Kết Truyện, Kết Tập, Kết Arc
+
+Dùng để kết một phần, một tập 10 tiếng, một arc lớn hoặc toàn bộ truyện. Kết hay không phải là đóng hết mọi thứ, mà là trả đủ nợ cảm xúc chính và mở đúng cánh cửa kế tiếp.
+
+### 4 Loại Kết
+
+1. **Kết chương**: trả một câu hỏi nhỏ, mở một câu hỏi mới.
+2. **Kết phần 10 chương**: hoàn thành mục tiêu vật chất, để lại một hậu quả xã hội.
+3. **Kết tập 10 tiếng**: thắng một trận lớn hoặc đạt một mốc đời sống, nhưng đổi bản đồ/mục tiêu.
+4. **Kết toàn truyện**: trả lời câu hỏi linh hồn của truyện: con người còn có thể xây nhà trong phế thổ không?
+
+### Công Thức Kết Chương
+
+Một kết chương nên có:
+
+- **Món nợ vừa trả**: tìm được nước, lấy được thuốc, thoát bẫy, chia xong vật tư.
+- **Một cái giá hiện ra**: bị nhớ mặt, mất một phần đồ, Tần Dã đau hơn, người khác sinh lòng tham.
+- **Một hình ảnh cuối**: cốc nước, vết máu, thẻ cư trú, lõi thú, cánh cửa, hạt giống, muỗng.
+- **Một câu hỏi mới**: ai đặt bẫy, lõi này thuộc Hắc Nha, người được cứu có phản bội không, cổng thành có mở không.
+
+Đừng kết chương bằng giải thích dài. Kết bằng hành động nhỏ hoặc vật nhỏ thường đau hơn.
+
+### Công Thức Kết Phần 10 Chương
+
+Phần 10 chương cần kết bằng **thắng nhỏ + hậu quả rõ**.
+
+Ví dụ:
+
+- lấy được bình lọc, nhưng cần lõi thay thế sau ba ngày;
+- bán được lõi thú, nhưng thương nhân nhận ra dấu Hắc Nha;
+- cứu được trẻ con, nhưng đội bị thiếu khẩu phần;
+- vào được khu ít phóng xạ, nhưng thẻ cư trú ghi sai tên;
+- thắng bọn cướp, nhưng luật thành bắt Chim Xám giải trình.
+
+Kết phần phải làm người nghe thấy: "Ổn rồi... nhưng không ổn lâu."
+
+### Công Thức Kết Tập 10 Tiếng
+
+Một tập 10 tiếng cần 5 bước cuối:
+
+1. **Thu hết các món nợ nhỏ**: nước, thuốc, tinh thạch, người được cứu, lời hứa.
+2. **Cho cao trào vật chất**: bão, thú lớn, kiểm tra giấy, chợ đen, trạm lọc, Hắc Nha.
+3. **Cho cao trào quan hệ**: một người trong đội bất đồng, một người hy sinh lợi ích, một người nói thật.
+4. **Cho chiến thắng có giá**: đạt mục tiêu nhưng mất thứ khác.
+5. **Đổi mục tiêu tập sau**: không còn chỉ là sống sót; giờ phải giữ căn cứ, cứu người, chống faction, tìm sự thật.
+
+Tập 10 tiếng không nên kết bằng "họ tiếp tục lên đường" quá chung. Phải kết bằng một mốc cụ thể:
+
+- Lâm Tịch cầm được thẻ vào thành;
+- Chim Xám có đường nước riêng;
+- Tần Dã đứng được ba bước nhưng Hắc Nha nhận tín hiệu;
+- bể lọc chạy giọt đầu tiên;
+- cổng thành đóng sau lưng họ, và tên họ bị ghi vào sổ đen.
+
+### Công Thức Kết Arc Lớn
+
+Arc lớn thường dài 1-2 tập. Kết arc phải trả lời:
+
+- **Mục tiêu vật chất ban đầu đạt chưa?**
+- **Ai đã đổi phe hoặc đổi niềm tin?**
+- **Luật nào của thế giới vừa bị phá?**
+- **Nhân vật chính mất sự ngây thơ nào?**
+- **Kẻ thù mới có lý do gì mạnh hơn kẻ thù cũ?**
+
+Ví dụ arc "vào thành":
+
+- đạt: có thẻ cư trú và nơi ở ít phóng xạ;
+- mất: nhận ra thành sạch nhưng người vẫn bị bán bằng giấy tờ;
+- đổi: Lâm Tịch không còn chỉ muốn vào thành, cô muốn có luật nước của riêng mình;
+- mở: trạm lọc/Hắc Nha bắt đầu xem Chim Xám là biến số.
+
+### Công Thức Kết Toàn Truyện
+
+Toàn truyện cần kết bằng **câu trả lời cảm xúc**, không chỉ thắng phản diện.
+
+Câu hỏi linh hồn của truyện:
+
+- Lâm Tịch từ người muốn vào thành để sống, có trở thành người xây được một nơi đáng sống không?
+- Tần Dã từ vũ khí bị bỏ đi, có trở thành con người được chọn ở lại không?
+- Chim Xám từ nhóm nhặt rác, có thành cộng đồng có luật và lòng người không?
+- Phế thổ có thể có nhà không, hay chỉ có tường?
+
+Kết toàn truyện nên trả:
+
+1. **Nước**: nguồn nước không còn là đặc quyền của kẻ mạnh.
+2. **Tên**: người từng bị xóa khỏi sổ có tên trong luật mới.
+3. **Nhà**: một cánh cửa khóa từ bên trong, không phải để nhốt người mà để bảo vệ người.
+4. **Tình cảm**: Lâm Tịch và Tần Dã không cần lời thề lớn; họ chọn cùng canh một đêm bình yên.
+5. **Di sản**: thế hệ sau biết trồng, lọc, chia, và không bán người yếu.
+
+### 7 Kiểu Kết Có Thể Dùng
+
+- **Kết thắng đau**: thắng mục tiêu, mất người/vật/niềm tin.
+- **Kết yên tạm**: một đêm bình yên sau nhiều chương căng, nhưng xa xa có dấu hiệu mới.
+- **Kết mở bản đồ**: cửa thành, bản đồ, radio, tín hiệu Hắc Nha, đường ray, mỏ tinh thạch.
+- **Kết phản bội**: người được cứu dùng đúng món được cho để đổi lấy an toàn.
+- **Kết lật nghĩa**: món đồ tưởng là phần thưởng hóa ra là lời triệu tập, dấu sở hữu, hoặc bẫy.
+- **Kết hồi âm cảm xúc**: nhắc lại muỗng, cốc nước, hạt giống, xe lăn từ đầu arc nhưng đổi ý nghĩa.
+- **Kết trưởng thành**: nhân vật làm điều đầu truyện không dám làm, nhưng bằng cách không phản bội bản thân.
+
+### Những Lỗi Kết Cần Tránh
+
+- Giết phản diện xong là hết, không trả nợ cảm xúc.
+- Kết bằng tóm tắt "nhiều năm sau" quá nhanh khi đồ vật/hành động chưa có hồi âm.
+- Cho nhân vật thắng quá sạch, không hậu quả.
+- Mở quá nhiều bí mật mới ở đoạn cuối tập khiến người nghe mệt.
+- Quên đội nhóm: kết chỉ có nam nữ chính, còn người khác biến mất.
+- Quên vật trung tâm: cả arc nói về nước/thuốc/tinh thạch nhưng kết không có hình ảnh vật đó.
+
+### Bảng Tự Kiểm Khi Kết
+
+Trước khi kết chương/phần/tập, hỏi:
+
+- Câu hỏi nào đã được trả?
+- Món nợ nào còn treo?
+- Ai trả giá?
+- Vật nào làm hình ảnh cuối?
+- Quan hệ nào đổi trạng thái?
+- Luật nào bị phá hoặc được lập?
+- Người nghe sẽ muốn nghe tiếp vì sợ gì, tò mò gì, hay thương ai?

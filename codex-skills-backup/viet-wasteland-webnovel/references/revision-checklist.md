@@ -79,3 +79,16 @@ Examples:
 - Tần Dã walks farther, but Hắc Nha notices.
 - A child survives, but the law now wants custody.
 - The city gives a card, but the card is a chain.
+
+## 8. Ending Payoff Test
+
+Before ending a chapter, part, episode, or arc:
+
+- Did the ending return to a concrete object from the scene or arc?
+- Did the protagonist win something visible?
+- Did the win create a cost, debt, enemy, rumor, injury, or law problem?
+- Did at least one relationship change state?
+- Did the ending avoid summarizing too much after the emotional peak?
+- If this is an episode/arc ending, did it close the current material goal while opening a larger moral/social goal?
+
+Good endings leave the listener satisfied for tonight but worried about tomorrow.
