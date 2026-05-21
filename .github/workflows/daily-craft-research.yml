@@ -1,0 +1,21 @@
+name: Daily Webnovel Craft Research
+
+on:
+  schedule:
+    # 18:20 ICT (UTC+7) = 11:20 UTC, chạy mỗi ngày
+    - cron: '20 11 * * *'
+    # Sau đó mỗi 5 tiếng
+    - cron: '20 16,21,2,7 * * *'
+  workflow_dispatch:
+
+jobs:
+  craft-research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run placeholder note
+        run: |
+          echo "Scheduled craft-learning run at $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo "Only research from public/legal sources; no demo, no main-story edits." 
