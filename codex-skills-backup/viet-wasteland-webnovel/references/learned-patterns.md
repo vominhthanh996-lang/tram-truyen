@@ -67,3 +67,36 @@ Từ khóa xuất hiện dày trong 100 chương: cá, điểm tích lũy, phón
 - Tập 5 trở đi nên giảm kiểu kể tóm tắt sự kiện. Mỗi phần cần một cảnh chính có áp lực rõ, một lựa chọn tốn giá, một món thu hoạch cụ thể, và một hậu quả xã hội.
 - Nếu viết cho video dài, nên chia mỗi tập 10 tiếng thành khoảng 100 chương ngắn/10 phần lớn; mỗi phần lớn có 10 chương, mỗi chương 900-1500 từ để giữ nhịp nghe.
 - Khi viết lại các tập sau, nên đặt trước "chuỗi đồ vật" cho từng phần. Ví dụ: tinh thạch bẩn -> bình lọc cũ -> mũi tên xương thú -> da cách xạ -> thẻ nước giả -> lõi thú không ăn được -> thuốc ổn định gen -> tem cư trú -> hạt giống sạch -> giếng lọc.
+
+## Tham khảo: Hạ Thanh - Sau 10 Năm Thảm Họa Tận Thế, Tôi Quyết Ra Khỏi Khu An Toàn Bắt Đầu Trồng Trọt
+
+- **Nguồn học**: Biển Truyện, truyện mạt thế/sinh tồn sau thiên tai, trọng tâm là rời khu an toàn, nhận lãnh địa, trồng trọt, giao dịch và đối phó sinh vật tiến hóa.
+- **Phạm vi học trong lượt này**: quét 50 chương đầu. Độ dài trung bình khoảng 1.832 từ/chương, nhiều chương có 40-70 đoạn, thoại xuất hiện dày trong các chương mặc cả, nhận đất, lập giao kèo.
+- **Điểm khác bộ trước**: bộ trước dùng nghèo đói + nhặt phế liệu để tạo sảng điểm nhỏ. Bộ này dùng quyền sở hữu đất + tự lập + giao dịch + sinh vật tiến hóa để tạo cảm giác "xây cơ nghiệp".
+
+### Nhịp 50 Chương Đầu
+
+- **Chương 1-4**: mở bằng bối cảnh thiên tai đã kéo dài 10 năm, sau đó đưa nhân vật vào lựa chọn rời khu an toàn và nhận khu đất riêng. Mồi truyện không phải "chết đói ngay", mà là "ở trong tường cũng không còn là sống".
+- **Chương 5-8**: tin nhắn, sửa nhà, kiểm tra nguy hiểm, xác lập lãnh địa. Đây là kiểu mở rộng thế giới qua công việc: kiểm tra nhà, rà bẫy, nhận thông tin, đo rủi ro.
+- **Chương 9-17**: sinh vật tiến hóa và bạn đồng hành. Cừu tiến hóa không chỉ là thú, mà thành tài sản, lao động, rủi ro và nguồn hài nhẹ.
+- **Chương 18-25**: mạng lưới người xung quanh lộ ra: khóc lóc, xung đột, mặt mũi, các lãnh chúa. Cao trào xã hội xen với cao trào sinh tồn.
+- **Chương 26-37**: giao dịch, tỷ lệ nảy mầm, guồng nước, lý do rời khu an toàn, thỏa thuận với đội mạnh. Truyện tạo lực bằng việc nhân vật phải biến lãnh địa thành hệ thống sống được.
+- **Chương 38-50**: sinh vật tiến hóa biển lên bờ, mèo tiến hóa, máy móc, kẻ rình mò, đào măng, chia chiến lợi phẩm. Cao trào tăng từ quản nhà sang quản biên giới lãnh địa.
+
+### Quy Luật Craft Rút Ra
+
+- **Mục tiêu dài phải có tài sản nhìn thấy được**: đất, nhà, guồng nước, tấm năng lượng mặt trời, máy cày, hạt giống, thú kéo cày. Người nghe thấy tiến độ vì tài sản tăng lên từng món.
+- **Cao trào không chỉ là đánh nhau**: một cuộc mặc cả máy móc, một điều kiện giao dịch, một tỷ lệ nảy mầm thấp, một cơn mưa độc, một kẻ rình mò cũng có thể là cao trào nếu nó đe dọa cơ nghiệp.
+- **Dùng "lãnh địa" để tạo tình tiết tự nhiên**: khi nhân vật có đất, mọi thứ tự kéo tới: hàng xóm, ranh giới, nước, vật tư, trộm, thú, thuế, đội tuần tra, hợp tác, tranh chấp.
+- **Sinh vật tiến hóa có vai trò xã hội**: cừu, mèo, chuột, lợn rừng không chỉ là quái. Chúng có thể là lao động, bạn đồng hành, nguồn thịt, nguy hiểm, chiến lợi phẩm, hoặc nguyên nhân khiến con người mặc cả.
+- **Thoại giao dịch là động cơ truyện**: nhân vật nói nhiều không phải để tán gẫu, mà để định giá, đặt điều kiện, thử đối phương, giữ mặt mũi, giấu điểm yếu.
+- **Hài nhẹ làm truyện dễ nghe**: giữa mạt thế nặng, các tình tiết kiểu thú cứng đầu, mặc cả keo kiệt, xấu hổ nhưng giả vờ bình tĩnh giúp người nghe thở ra.
+- **Từ khóa vật chất lặp lại tạo cảm giác đời sống**: tiến hóa, cừu, đất, đội, nước, lãnh địa, máy, trồng, khu an toàn, mưa, rau, hạt, thuốc, bảo hộ. Đây là bộ từ khóa của một truyện "xây nhà sau tận thế".
+
+### Cách Chuyển Hóa Cho "Phế Thổ: Ta Nhặt Được Cả Thế Giới"
+
+- Lâm Tịch không nên chỉ đi tìm tinh thạch. Cô cần có một **điểm sống riêng** từng bước hình thành: góc phòng, bể lọc, kho nhỏ, giường khô, chốt gác, đường nước, vườn thử nghiệm.
+- Tần Dã có thể đóng vai "bộ nhớ chiến thuật" của lãnh địa: nghe tiếng chân, đo đường thoát, nhìn dấu thú, biết hợp đồng nào có bẫy.
+- Thú biến dị trong truyện mình nên có công dụng sau khi chết hoặc sau khi thuần hóa tạm thời: kéo đồ, lọc độc, báo động, lấy da, lấy tuyến, lấy lõi, đổi thuốc.
+- Các cao trào sau nên đa dạng hơn: không chỉ Hắc Nha truy sát, mà còn tranh chấp đường nước, tỷ lệ hạt sạch thất bại, hàng xóm phản bội, trạm lọc ép hợp đồng, thú bị mùi tinh thạch kéo tới.
+- Có thể thêm "hài sinh tồn khô": A Thất mặc cả quá lố, Di Mạn mắng trong lúc cứu người, Tần Dã nói một câu lạnh làm cả đội im, Lâm Tịch tiếc nửa cái đinh gỉ hơn một lời khen.

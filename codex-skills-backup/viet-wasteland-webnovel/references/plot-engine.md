@@ -140,3 +140,35 @@ Trước mỗi chương, điền nhanh:
 - **Cảnh này làm quan hệ hai người/đội thay đổi thế nào?**
 - **Kết chương mở câu hỏi gì?**
 
+## 9. Engine Xây Cơ Nghiệp Sau Tận Thế
+
+Dùng khi muốn truyện có cảm giác càng đọc càng giàu, càng vững, càng nhiều thứ để mất.
+
+### Một Cơ Nghiệp Cần 7 Lớp
+
+1. **Chỗ trú**: cửa khóa, chỗ ngủ khô, góc giấu đồ, đường thoát.
+2. **Nước**: nguồn, bình chứa, bộ lọc, quyền lấy nước, người canh nước.
+3. **Thức ăn**: đồ nhặt được, hạt giống, đất sạch, thú/rau biến dị có thể xử lý.
+4. **Công cụ**: dao, dây, xe kéo, xe lăn cải tạo, bẫy, máy móc cũ.
+5. **Phòng thủ**: báo động, bẫy, tường, quy tắc gác, đường rút.
+6. **Giao dịch**: người mua, người bán, giá thị trường, món độc quyền.
+7. **Danh nghĩa**: thẻ cư trú, giấy nước, hợp đồng, luật bảo hộ, uy tín.
+
+Mỗi phần 10 chương nên nâng ít nhất một lớp lên một bậc, nhưng làm hỏng hoặc gây nợ ở một lớp khác.
+
+### Cao Trào Cơ Nghiệp
+
+Cao trào không nhất thiết phải là đánh nhau. Có thể là:
+
+- **Cao trào nước**: nguồn nước bị cắt, bộ lọc hỏng, nước đổi màu, có người chen hàng, trẻ con khát.
+- **Cao trào đất**: đất nhiễm xạ, hạt không nảy mầm, tranh ranh giới, phát hiện xác/chất độc dưới nền.
+- **Cao trào giao dịch**: thương nhân ép giá, hợp đồng có bẫy, đổi máy lấy thuốc nhưng mất quyền tự chủ.
+- **Cao trào thú biến dị**: thú không chỉ tấn công, mà phá kho, ăn kim loại, dụ bầy khác tới, hoặc mang thứ quý trong người.
+- **Cao trào danh nghĩa**: giấy tờ hết hạn, thẻ nước bị nghi giả, luật mới đánh vào người ngoài thành.
+
+### Luật Viết Cơ Nghiệp
+
+- Mỗi tài sản mới phải có tên, vị trí, công dụng và điểm yếu.
+- Đừng để nhân vật "có căn cứ" chung chung. Hãy cho người nghe nhớ: cái cửa kêu, thùng nước đặt dưới gầm, giường ai ngủ cạnh tường, dây bẫy buộc ở đâu.
+- Khi cơ nghiệp lớn lên, kẻ thù không chỉ muốn giết nhân vật; họ muốn mua, thuê, đánh thuế, chiếm, hợp thức hóa hoặc biến nó thành tài sản của hệ thống.
+- Người nghe phải đếm được tiến độ: hôm qua chỉ có một cốc nước đục, hôm nay có một bình lọc; hôm qua Tần Dã nằm, hôm nay anh canh được nửa đêm; hôm qua Lâm Tịch đi xin việc, hôm nay có người tới xin đổi đồ.

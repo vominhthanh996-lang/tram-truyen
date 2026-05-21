@@ -30,6 +30,16 @@ Use Vietnamese with full diacritics. Prefer clear, sensory, emotionally direct p
 - **Không gồng bi tráng quá sớm**: người nghèo trong phế thổ thường không có thời gian nói lời lớn. Họ tính toán, cười nhạt, tiếc một miếng ăn, rồi vẫn làm.
 - **Tên chương nên hứa một phần thưởng**: "Bình Lọc Cũ", "Lõi Thú Không Ăn Được", "Nửa Viên Tinh Thạch", "Thẻ Nước Giả", "Một Cái Giường Khô". Người nghe nhìn tên là muốn biết món đó sẽ đổi đời ra sao.
 
+## Hành Văn Kiểu Xây Lãnh Địa
+
+Dùng khi truyện chuyển từ "sống qua ngày" sang "dựng nơi để sống".
+
+- **Viết công việc như viết chiến đấu**: sửa cửa, đào rãnh, lọc nước, gieo hạt, đặt bẫy đều phải có áp lực, sai lầm, tiếng động, mùi, đau tay, người nhìn trộm.
+- **Để đồ vật tạo tính cách**: người keo kiệt tiếc đinh; người từng làm lính không quay lưng ra cửa; người từng đói luôn đếm khẩu phần; người thương người khác sẽ chia phần tốt nhưng nói là mình không thích ăn.
+- **Thoại giao dịch phải có lưỡi dao**: mỗi câu mặc cả nên giấu một điều kiện, một lời thử, một sự khinh thường, một chút thăm dò, hoặc một lối thoát.
+- **Hài khô vừa đủ**: phế thổ càng nặng càng cần vài nhịp thở. Hài nên đến từ tính người và tình huống sinh tồn, không phá cảm giác nguy hiểm.
+- **Cao trào đời thường phải được viết nghiêm túc**: một trận mưa độc, một hạt không nảy, một cái máy hỏng, một giấy tờ bị giữ cũng có thể căng như đánh nhau nếu nó đe dọa cả nhóm.
+
 Good texture:
 
 - "mùi kim loại gỉ", "nước vàng", "bụi đỏ", "vải ẩm", "đèn mỡ", "cốc nước có vạch";
