@@ -94,3 +94,7 @@ A chapter is not ready if:
 Use `references/style-bible.md` and `references/revision-checklist.md` for deeper guidance when doing serious drafting or revision.
 
 Use `references/plot-engine.md` when planning long arcs, creating chapter events, making 10-hour episode outlines, or fixing a draft that feels rushed, flat, or summary-like.
+
+Use `references/chapter-template.md` before drafting chapters, 10-chapter parts, or 10-hour episode plans.
+
+Use `references/prompt-pack.md` to generate, revise, score, or expand chapters, arcs, factions, and mutated beasts in a consistent voice.
