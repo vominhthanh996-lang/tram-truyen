@@ -38,3 +38,11 @@
 2. Nguồn về **arc ending design** (đóng xung đột chính + mở bí mật tuyến lớn).
 3. Nguồn về **đối thoại nhiều phe** (đàm phán, ép giá, ngôn ngữ quyền lực mềm).
 4. Nếu còn ngân sách: bổ sung digest từ transcript YouTube craft công khai (không chép văn).
+
+## Bổ sung sau khi rà workspace Content truyen
+- Thời gian bổ sung: 2026-05-22 ICT.
+- Đã xác nhận workspace đúng là `E:\ThanhMV\Content truyen`.
+- Đã bổ sung `research/story-upgrade-suggestions.md`.
+- Đã bổ sung `demos/demo-after-learning.md` với demo mở chương khoảng 1.900 từ.
+- Không sửa Tập 1-3 bản v3.
+- Không chạm vào các file Tập 4 đang có trạng thái bị xoá trong working tree.
