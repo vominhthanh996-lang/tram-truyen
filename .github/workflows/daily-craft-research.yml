@@ -1,9 +1,9 @@
-name: Webnovel Craft Auto Learning Every 5 Minutes
+name: Webnovel Craft Auto Learning Every 30 Minutes
 
 on:
   schedule:
-    # Every 5 minutes. GitHub may delay scheduled runs, but this is the minimum supported interval.
-    - cron: '*/5 * * * *'
+    # Every 30 minutes. Runs in GitHub Actions, so it works even when the local PC is off.
+    - cron: '*/30 * * * *'
   push:
     branches:
       - main

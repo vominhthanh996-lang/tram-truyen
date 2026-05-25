@@ -16,6 +16,30 @@ RESEARCH = ROOT / "research"
 RUNS = RESEARCH / "learning-runs"
 STATE_PATH = RESEARCH / "auto-learning-state.json"
 
+PROJECT_REQUIREMENTS = """
+Bạn là phụ tá nghiên cứu và huấn luyện văn phong dài hạn cho tiểu thuyết mạng Việt Nam
+"Phế Thổ: Ta Nhặt Được Cả Thế Giới".
+
+Ràng buộc cứng:
+- Chỉ học craft từ nguồn công khai hợp pháp.
+- Không bypass paywall, không dùng nguồn lậu, không dùng chương khóa.
+- Không sao chép văn nguồn, không bắt chước nguyên văn câu chữ, hình ảnh đặc thù,
+  đoạn thoại, cảnh nổi tiếng.
+- Chỉ rút kỹ thuật: nhịp chương, mở cảnh, đẩy tình tiết, nội tâm, hồi tưởng,
+  cao trào, hook cuối chương, xây đồng đội, tình cảm, hy sinh, trả cảm xúc.
+- Không viết demo, không viết chương mới, không sửa nội dung truyện chính.
+- Không tự nâng version/tag.
+- Tất cả ghi chú phải viết tiếng Việt có dấu đầy đủ.
+
+Ưu tiên học tiếp:
+1. Slow-burn relationship trong survival fiction: trust ladder, consent, micro-care.
+2. Arc ending design: đóng xung đột chính, trả cảm xúc, mở bí mật tuyến lớn.
+3. Đối thoại nhiều phe: đàm phán, ép giá, quyền lực mềm, ngôn ngữ thủ tục.
+4. Sinh tồn phế thổ: đói, nước, phóng xạ, đồ ăn bẩn, tinh thạch, logistics.
+5. Kỳ ngộ không hệ thống/dị năng/tu tiên: may mắn hợp logic, trực giác sinh tồn, vật chứng.
+6. Lỗi văn máy cần tránh và cách làm văn người hơn.
+"""
+
 SOURCES = [
     {
         "name": "Helping Writers Become Authors - Scene Structure",
@@ -118,6 +142,7 @@ def fallback_digest(source: dict, title: str, text: str, error: str | None = Non
 - Mỗi lượt học chỉ ghi craft pattern, không chép văn nguồn.
 - Với Phế Thổ, ưu tiên biến kiến thức nguồn thành quy tắc hành động: mở cảnh bằng áp lực sống còn, để vật tư tạo xung đột, kết cảnh bằng một thay đổi có giá.
 - Khi không có LLM secret, batch này dùng fallback: đọc tiêu đề/heading/đoạn công khai rồi ghi insight mức khung. Muốn phân tích sâu hơn, thêm GitHub secret `OPENAI_API_KEY`.
+- Batch tự động chạy trên GitHub Actions mỗi 30 phút, nên vẫn chạy khi máy local tắt, miễn workflow đang enabled.
 
 ### Áp dụng cho Phế Thổ
 - Biến `{source["focus"]}` thành checklist khi sửa chương: cảnh phải có mục tiêu cụ thể, cản trở cụ thể, giá phải trả, và hook không dựa vào sao chép nguồn.
@@ -134,9 +159,7 @@ def llm_digest(source: dict, title: str, text: str) -> str | None:
         return None
     model = os.environ.get("OPENAI_MODEL") or "gpt-4.1-mini"
     prompt = f"""
-Bạn là phụ tá nghiên cứu craft cho tiểu thuyết mạng Việt Nam "Phế Thổ: Ta Nhặt Được Cả Thế Giới".
-Chỉ học kỹ thuật từ nguồn công khai, tuyệt đối không chép câu chữ, cảnh nổi tiếng, ví dụ đặc thù.
-Không viết demo, không viết chương mới, không sửa canon.
+{PROJECT_REQUIREMENTS}
 
 Nguồn: {source["name"]}
 Link: {source["url"]}
@@ -150,6 +173,7 @@ Trích nội dung công khai đã làm sạch, chỉ dùng để phân tích cra
 Hãy trả về tiếng Việt có dấu, dạng markdown ngắn:
 - kỹ thuật học được
 - áp dụng cho Phế Thổ
+- nên cập nhật mục nào trong craft lab/source digest
 - lỗi cần tránh
 - ghi rõ không chép văn nguồn
 """
@@ -207,7 +231,7 @@ def update_learning_state(now: dt.datetime, source: dict, mode: str, run_path: P
     marker = "## Auto Learning Status"
     block = f"""## Auto Learning Status
 - Lần chạy gần nhất: {now.strftime('%Y-%m-%d %H:%M:%S UTC')}.
-- Lịch GitHub Actions mong muốn: mỗi 5 phút (`*/5 * * * *`).
+- Lịch GitHub Actions mong muốn: mỗi 30 phút (`*/30 * * * *`), chạy trên GitHub nên không phụ thuộc máy local.
 - Nguồn vừa học: {source["name"]} ({source["url"]}).
 - Chế độ học: {mode}.
 - Ghi chú batch: `{run_path.as_posix()}`.
