@@ -142,7 +142,7 @@ def fallback_digest(source: dict, title: str, text: str, error: str | None = Non
 - Mỗi lượt học chỉ ghi craft pattern, không chép văn nguồn.
 - Với Phế Thổ, ưu tiên biến kiến thức nguồn thành quy tắc hành động: mở cảnh bằng áp lực sống còn, để vật tư tạo xung đột, kết cảnh bằng một thay đổi có giá.
 - Khi không có LLM secret, batch này dùng fallback: đọc tiêu đề/heading/đoạn công khai rồi ghi insight mức khung. Muốn phân tích sâu hơn, thêm GitHub secret `OPENAI_API_KEY`.
-- Batch tự động chạy trên GitHub Actions mỗi 5 phút, nên vẫn chạy khi máy local tắt, miễn workflow đang enabled.
+- Batch tự động chạy trên GitHub Actions mỗi 30 phút, nên vẫn chạy khi máy local tắt, miễn workflow đang enabled.
 
 ### Áp dụng cho Phế Thổ
 - Biến `{source["focus"]}` thành checklist khi sửa chương: cảnh phải có mục tiêu cụ thể, cản trở cụ thể, giá phải trả, và hook không dựa vào sao chép nguồn.
@@ -231,7 +231,7 @@ def update_learning_state(now: dt.datetime, source: dict, mode: str, run_path: P
     marker = "## Auto Learning Status"
     block = f"""## Auto Learning Status
 - Lần chạy gần nhất: {now.strftime('%Y-%m-%d %H:%M:%S UTC')}.
-- Lịch GitHub Actions mong muốn: mỗi 5 phút (`*/5 * * * *`), chạy trên GitHub nên không phụ thuộc máy local.
+- Lịch GitHub Actions mong muốn: mỗi 30 phút (`*/30 * * * *`), chạy trên GitHub nên không phụ thuộc máy local.
 - Nguồn vừa học: {source["name"]} ({source["url"]}).
 - Chế độ học: {mode}.
 - Ghi chú batch: `{run_path.as_posix()}`.
