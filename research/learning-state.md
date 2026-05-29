@@ -48,10 +48,10 @@
 - Không chạm vào các file Tập 4 đang có trạng thái bị xoá trong working tree.
 
 ## Auto Learning Status
-- Lần chạy gần nhất: 2026-05-28 23:59:16 UTC.
+- Lần chạy gần nhất: 2026-05-29 12:27:55 UTC.
 - Lịch GitHub Actions mong muốn: mỗi 30 phút (`*/30 * * * *`), chạy trên GitHub nên không phụ thuộc máy local.
-- Nguồn vừa học: TV Tropes - Apocalyptic Logistics (https://tvtropes.org/pmwiki/pmwiki.php/Main/ApocalypticLogistics).
+- Nguồn vừa học: TV Tropes - Scavenger World (https://tvtropes.org/pmwiki/pmwiki.php/Main/ScavengerWorld).
 - Chế độ học: fallback.
-- Ghi chú batch: `/home/runner/work/story_ThanhMV/story_ThanhMV/research/learning-runs/2026-05-28.md`.
+- Ghi chú batch: `/home/runner/work/story_ThanhMV/story_ThanhMV/research/learning-runs/2026-05-29.md`.
 - Quy tắc: không viết demo, không viết chương mới, không sửa nội dung truyện chính, không chép văn nguồn.
 
