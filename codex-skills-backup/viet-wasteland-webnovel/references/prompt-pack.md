@@ -107,3 +107,45 @@ Tạo một faction/phản diện cho truyện, gồm:
 
 Không viết phản diện ngu hoặc ác một màu.
 
+## Prompt Tạo Storyboard/Image Prompt Bám Cốt Truyện
+
+Tạo storyboard hình ảnh cho "Phế Thổ: Ta Nhặt Được Cả Thế Giới" từ đoạn truyện sau. Mỗi cảnh phải bám đúng sự kiện đang xảy ra, không tạo ảnh đứng tạo dáng. Với mỗi scene, xuất:
+
+- `scene_id`
+- `narration_summary`
+- `characters_present`
+- `action_in_frame`
+- `location`
+- `props`
+- `image_prompt`
+- `negative_prompt`
+
+Quy tắc bắt buộc:
+
+1. Image prompt phải mô tả hành động cụ thể trong cảnh, ví dụ: chạy qua tro, kéo người bị thương, gõ nhịp trên ray, đọc sổ trước đám đông, bò qua cống, giữ dây bạt, bắn hộp còi, cõng người sốt. Không dùng "standing and posing".
+2. Bối cảnh phải đúng truyện: phế thổ bụi đỏ, đường ray sập, chợ cháo đêm, nồi cháo, bạt rách, cổng/cửa vàng, cống thấp, phòng thuốc Cổng Xám, nước xám, sổ người, còi T.S., dây phản ứng.
+3. Phục trang phải đúng phế thổ: áo khoác vải thô, áo giáp nhẹ tự chế, khăn che bụi, băng vải, túi nước, thắt lưng dụng cụ, giày cao cổ cũ, vết máu/vết bụi. Không sạch đẹp như studio.
+4. Tần Dã phải luôn là nam lính đánh thuê bị thương có khí chất nam nhi: áo khoác chiến thuật tối màu rách, áo trong vải dày, dây đai/băng gen, quần chiến thuật, giày cao cổ, ánh mắt lạnh và mệt. Tuyệt đối không bikini, không đồ bơi, không sport bra, không bare chest, không đồ gym bó sát, không tạo dáng người mẫu.
+5. Lâm Tịch là cô gái gầy, tỉnh, lì, đồ sinh tồn bụi bặm, túi nước/dao/sổ/vật chứng tùy cảnh. Không váy đẹp, không makeup bóng, không fantasy.
+6. Phụ nữ ở chợ đen có thể xộc xệch, rách, bị ép sinh tồn, nhưng không erotic hóa và không tạo dáng quyến rũ. Trọng tâm là tội ác, sợ hãi, hậu quả và phản kháng.
+7. Trẻ em chỉ được mô tả như nạn nhân lao động/sinh tồn: áo bẩn, tay băng, chân trần/giày rách, bát gỗ, lõi lọc. Tuyệt đối không sexualize.
+8. Không dùng yếu tố tu tiên, phép thuật, dị năng, aura thần thánh, fantasy armor bóng loáng.
+
+Negative prompt mặc định cho mọi scene:
+
+`bikini, swimsuit, sports bra, underwear, lingerie, shirtless male, bare chest, sexy pose, seductive pose, fashion pose, glamour, studio photoshoot, clean clothes, modern gym outfit, superhero spandex, idol poster, looking at camera, static standing pose, smiling model, polished armor, fantasy magic, wuxia, cultivation, glowing superpower`
+
+Mẫu scene đúng:
+
+```json
+{
+  "scene_id": "tap12_p10_01",
+  "narration_summary": "Tần Dã dùng nhịp gõ thay còi để kéo người săn rời khỏi Cổng Xám.",
+  "characters_present": ["Tần Dã"],
+  "action_in_frame": "Tần Dã ngồi trong phòng thuốc, tay rớm máu gõ lên miếng kim loại, cố giữ tỉnh táo.",
+  "location": "phòng thuốc bụi bặm trong Cổng Xám",
+  "props": ["miếng kim loại", "bản đồ phế thổ", "bát nước", "băng gen", "đèn dầu"],
+  "image_prompt": "Tần Dã, wounded gene-modified mercenary, sitting beside a cracked metal table inside a dusty wasteland infirmary, wearing a torn dark tactical coat, thick layered shirt, cloth-and-metal light armor, bandaged forearms, utility belt and old combat boots, one bleeding hand tapping a metal rhythm, exhausted but sharp eyes, red dust in the air, survival equipment, water ration marks, cinematic gritty post-apocalyptic documentary frame, candid action moment, not posing",
+  "negative_prompt": "bikini, swimsuit, sports bra, underwear, lingerie, shirtless male, bare chest, sexy pose, fashion pose, glamour, studio photoshoot, clean clothes, modern gym outfit, superhero spandex, idol poster, looking at camera, static standing pose, smiling model, polished armor, fantasy magic, wuxia, cultivation, glowing superpower"
+}
+```
