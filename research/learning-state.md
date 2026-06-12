@@ -48,10 +48,10 @@
 - Không chạm vào các file Tập 4 đang có trạng thái bị xoá trong working tree.
 
 ## Auto Learning Status
-- Lần chạy gần nhất: 2026-06-11 21:31:21 UTC.
+- Lần chạy gần nhất: 2026-06-12 11:54:39 UTC.
 - Lịch GitHub Actions mong muốn: mỗi 30 phút (`*/30 * * * *`), chạy trên GitHub nên không phụ thuộc máy local.
-- Nguồn vừa học: Reedsy - Story structure (https://blog.reedsy.com/guide/story-structure/).
+- Nguồn vừa học: Helping Writers Become Authors - Scene Structure (https://www.helpingwritersbecomeauthors.com/scene-structure/).
 - Chế độ học: fallback.
-- Ghi chú batch: `/home/runner/work/story_ThanhMV/story_ThanhMV/research/learning-runs/2026-06-11.md`.
+- Ghi chú batch: `/home/runner/work/story_ThanhMV/story_ThanhMV/research/learning-runs/2026-06-12.md`.
 - Quy tắc: không viết demo, không viết chương mới, không sửa nội dung truyện chính, không chép văn nguồn.
 
