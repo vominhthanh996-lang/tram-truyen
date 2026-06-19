@@ -14,6 +14,7 @@ const els = {
 
 const storageKey = "doctruyen_vip_state_v1";
 let state = loadState();
+let activeRouteHash = "";
 const supabaseConfig = window.SUPABASE_CONFIG || {};
 const sharedCommentsEnabled = Boolean(
   supabaseConfig.url &&
@@ -57,6 +58,14 @@ function loadState() {
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(state));
   renderAccount();
+}
+
+function normalizeText(value) {
+  return String(value ?? "").normalize("NFC");
+}
+
+function clampReaderSize(value) {
+  return Math.min(24, Math.max(16, Number(value) || 19));
 }
 
 function money(value) {
@@ -233,7 +242,7 @@ function hydrateVisibleComments() {
 }
 
 function escapeHtml(value) {
-  return value
+  return normalizeText(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -486,6 +495,7 @@ function renderReader(storyId, chapterId) {
   const chapter = getChapter(storyId, chapterId);
   if (!story || !chapter) return renderNotFound();
 
+  state.readerSize = clampReaderSize(state.readerSize);
   document.documentElement.style.setProperty("--reader-size", `${state.readerSize}px`);
   document.body.classList.toggle("reader-dark", state.darkReader);
 
@@ -499,6 +509,8 @@ function renderReader(storyId, chapterId) {
 
   els.view.innerHTML = `
     <article class="reader">
+      <h1>${escapeHtml(chapter.title)}</h1>
+      <p class="muted reader-meta">${escapeHtml(story.title)} · ${chapter.free ? "Chương miễn phí" : `${chapter.price} xu / VIP`}</p>
       <div class="reader-toolbar">
         <a class="btn btn-secondary" href="#/story/${story.id}">Danh sách chương</a>
         <div>
@@ -507,11 +519,9 @@ function renderReader(storyId, chapterId) {
           <button class="btn btn-secondary" id="toggleReaderTheme">${state.darkReader ? "Nền sáng" : "Nền tối"}</button>
         </div>
       </div>
-      <h1>${chapter.title}</h1>
-      <p class="muted">${story.title} · ${chapter.free ? "Chương miễn phí" : `${chapter.price} xu / VIP`}</p>
       ${
         readable
-          ? `<section class="reader-content">${chapter.body.map((p) => `<p>${p}</p>`).join("")}</section>`
+          ? `<section class="reader-content">${chapter.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`
           : paywallBlock(storyId, chapter)
       }
       <div class="reader-toolbar" style="margin-top:18px; position:static">
@@ -666,6 +676,8 @@ function toast(message) {
 
 function route() {
   const hash = location.hash.replace(/^#/, "") || "/";
+  const shouldScrollTop = hash !== activeRouteHash;
+  activeRouteHash = hash;
   const [_, routeName, id, chapterId] = hash.split("/");
   document.body.classList.toggle("reader-dark", state.darkReader && routeName === "read");
   setActiveNav(hash);
@@ -678,6 +690,7 @@ function route() {
   else renderNotFound();
   hydrateVisibleComments();
   els.view.focus({ preventScroll: true });
+  if (shouldScrollTop) window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
 
 document.addEventListener("click", (event) => {
@@ -696,7 +709,7 @@ document.addEventListener("click", (event) => {
 
   const sizeButton = event.target.closest("[data-reader-size]");
   if (sizeButton) {
-    state.readerSize = Math.min(24, Math.max(16, state.readerSize + Number(sizeButton.dataset.readerSize)));
+    state.readerSize = clampReaderSize(state.readerSize + Number(sizeButton.dataset.readerSize));
     saveState();
     route();
   }
