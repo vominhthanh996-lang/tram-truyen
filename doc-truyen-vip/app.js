@@ -14,6 +14,14 @@ const els = {
 
 const storageKey = "doctruyen_vip_state_v1";
 let state = loadState();
+const supabaseConfig = window.SUPABASE_CONFIG || {};
+const sharedCommentsEnabled = Boolean(
+  supabaseConfig.url &&
+  supabaseConfig.anonKey &&
+  !supabaseConfig.url.includes("YOUR_") &&
+  !supabaseConfig.anonKey.includes("YOUR_")
+);
+const remoteComments = {};
 
 function defaultLastRead() {
   return {
@@ -80,15 +88,70 @@ function commentKey(storyId, chapterId = "story") {
 }
 
 function getComments(storyId, chapterId = "story") {
-  return state.comments?.[commentKey(storyId, chapterId)] || [];
+  const key = commentKey(storyId, chapterId);
+  return sharedCommentsEnabled ? remoteComments[key] || [] : state.comments?.[key] || [];
 }
 
-function addComment(storyId, chapterId, text) {
+async function supabaseRequest(path, options = {}) {
+  const baseUrl = supabaseConfig.url.replace(/\/$/, "");
+  const response = await fetch(`${baseUrl}/rest/v1/${path}`, {
+    ...options,
+    headers: {
+      apikey: supabaseConfig.anonKey,
+      Authorization: `Bearer ${supabaseConfig.anonKey}`,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    }
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || `Supabase request failed: ${response.status}`);
+  }
+
+  if (response.status === 204) return null;
+  return response.json();
+}
+
+async function loadRemoteComments(storyId, chapterId = "story") {
+  if (!sharedCommentsEnabled) return;
+  const key = commentKey(storyId, chapterId);
+  const query = `comments?target_key=eq.${encodeURIComponent(key)}&select=id,author,body,created_at&order=created_at.desc&limit=50`;
+  const rows = await supabaseRequest(query);
+  remoteComments[key] = rows.map((row) => ({
+    id: row.id,
+    author: row.author,
+    text: row.body,
+    createdAt: row.created_at
+  }));
+  refreshCommentPanel(storyId, chapterId);
+}
+
+async function addComment(storyId, chapterId, text) {
   const cleaned = text.trim();
   if (!cleaned) {
     toast("Bạn chưa nhập nội dung bình luận.");
     return false;
   }
+
+  if (sharedCommentsEnabled) {
+    const key = commentKey(storyId, chapterId);
+    await supabaseRequest("comments", {
+      method: "POST",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify({
+        target_key: key,
+        story_id: storyId,
+        chapter_id: chapterId === "story" ? null : chapterId,
+        author: state.user.name || "Độc giả",
+        body: cleaned.slice(0, 800)
+      })
+    });
+    await loadRemoteComments(storyId, chapterId);
+    toast("Đã gửi bình luận chung.");
+    return true;
+  }
+
   const key = commentKey(storyId, chapterId);
   state.comments = state.comments || {};
   state.comments[key] = [
@@ -108,8 +171,9 @@ function addComment(storyId, chapterId, text) {
 function renderComments(storyId, chapterId = "story") {
   const comments = getComments(storyId, chapterId);
   const title = chapterId === "story" ? "Bình luận truyện" : "Bình luận chương";
+  const targetKey = commentKey(storyId, chapterId);
   return `
-    <section class="comments-panel">
+    <section class="comments-panel" data-comments-scope="${targetKey}" data-comments-story="${storyId}" data-comments-chapter="${chapterId}">
       <div class="section-head compact">
         <div>
           <span class="eyebrow">Cộng đồng</span>
@@ -117,6 +181,11 @@ function renderComments(storyId, chapterId = "story") {
         </div>
         <span class="status-chip">${comments.length} bình luận</span>
       </div>
+      <p class="comment-mode ${sharedCommentsEnabled ? "shared" : "local"}">
+        ${sharedCommentsEnabled
+          ? "Bình luận chung: mọi độc giả đều thấy sau khi gửi."
+          : "Chưa cấu hình Supabase nên bình luận tạm lưu trên trình duyệt này."}
+      </p>
       <form class="comment-form" data-comment-form="${storyId}" data-comment-chapter="${chapterId}">
         <label>
           <span>Viết bình luận</span>
@@ -137,6 +206,30 @@ function renderComments(storyId, chapterId = "story") {
       </div>
     </section>
   `;
+}
+
+function refreshCommentPanel(storyId, chapterId = "story") {
+  const key = commentKey(storyId, chapterId);
+  const panel = [...document.querySelectorAll("[data-comments-scope]")]
+    .find((item) => item.dataset.commentsScope === key);
+  if (panel) {
+    panel.outerHTML = renderComments(storyId, chapterId);
+  }
+}
+
+function hydrateVisibleComments() {
+  if (!sharedCommentsEnabled) return;
+  document.querySelectorAll("[data-comments-scope]").forEach((panel) => {
+    loadRemoteComments(panel.dataset.commentsStory, panel.dataset.commentsChapter)
+      .catch(() => {
+        const mode = panel.querySelector(".comment-mode");
+        if (mode) {
+          mode.textContent = "Không tải được bình luận chung. Kiểm tra Supabase config/RLS.";
+          mode.classList.remove("shared");
+          mode.classList.add("local");
+        }
+      });
+  });
 }
 
 function escapeHtml(value) {
@@ -573,6 +666,7 @@ function route() {
   else if (routeName === "wallet") renderWallet();
   else if (routeName === "admin") renderAdmin();
   else renderNotFound();
+  hydrateVisibleComments();
   els.view.focus({ preventScroll: true });
 }
 
@@ -617,16 +711,29 @@ document.addEventListener("click", (event) => {
   }
 });
 
-document.addEventListener("submit", (event) => {
+document.addEventListener("submit", async (event) => {
   const form = event.target.closest("[data-comment-form]");
   if (!form) return;
   event.preventDefault();
   const storyId = form.dataset.commentForm;
   const chapterId = form.dataset.commentChapter || "story";
   const input = form.elements.comment;
-  if (addComment(storyId, chapterId, input.value)) {
-    if (chapterId === "story") renderStory(storyId);
-    else route();
+  const button = form.querySelector("button[type='submit']");
+  button.disabled = true;
+  button.textContent = "Đang gửi...";
+  try {
+    if (await addComment(storyId, chapterId, input.value)) {
+      input.value = "";
+      if (!sharedCommentsEnabled) {
+        if (chapterId === "story") renderStory(storyId);
+        else route();
+      }
+    }
+  } catch {
+    toast("Chưa gửi được bình luận chung. Kiểm tra Supabase config.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Gửi bình luận";
   }
 });
 

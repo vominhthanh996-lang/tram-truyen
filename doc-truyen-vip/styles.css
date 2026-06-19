@@ -490,6 +490,24 @@ a {
   gap: 10px;
 }
 
+.comment-mode {
+  margin: -4px 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.comment-mode.shared {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.comment-mode.local {
+  background: #fff7ed;
+  color: #9a3412;
+}
+
 .comment-form label {
   display: grid;
   gap: 6px;
@@ -512,6 +530,11 @@ a {
   background: var(--surface);
   color: var(--text);
   line-height: 1.55;
+}
+
+.comment-form button:disabled {
+  cursor: wait;
+  opacity: 0.72;
 }
 
 .comment-list {
