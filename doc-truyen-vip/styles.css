@@ -295,6 +295,10 @@ a {
   margin: 30px 0 14px;
 }
 
+.section-head.compact {
+  margin: 0 0 14px;
+}
+
 .story-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -471,6 +475,75 @@ a {
   gap: 12px;
   align-items: center;
   padding: 14px;
+}
+
+.comments-panel {
+  margin-top: 26px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.comment-form {
+  display: grid;
+  gap: 10px;
+}
+
+.comment-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.comment-form span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.comment-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.comment-item {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.comment-item p {
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.comment-meta strong {
+  color: var(--text);
+  font-size: 14px;
 }
 
 .chapter-row strong {

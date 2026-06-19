@@ -27,6 +27,7 @@ function loadState() {
     user: { name: "Thanh", coins: 18, vipUntil: null },
     unlocked: {},
     transactions: [],
+    comments: {},
     readerSize: 19,
     darkReader: false,
     lastRead: defaultLastRead(),
@@ -72,6 +73,79 @@ function chapterKey(storyId, chapterId) {
 
 function canRead(storyId, chapter) {
   return chapter.free || isVip() || Boolean(state.unlocked[chapterKey(storyId, chapter.id)]);
+}
+
+function commentKey(storyId, chapterId = "story") {
+  return chapterId === "story" ? `story:${storyId}` : `chapter:${storyId}:${chapterId}`;
+}
+
+function getComments(storyId, chapterId = "story") {
+  return state.comments?.[commentKey(storyId, chapterId)] || [];
+}
+
+function addComment(storyId, chapterId, text) {
+  const cleaned = text.trim();
+  if (!cleaned) {
+    toast("Bạn chưa nhập nội dung bình luận.");
+    return false;
+  }
+  const key = commentKey(storyId, chapterId);
+  state.comments = state.comments || {};
+  state.comments[key] = [
+    {
+      id: crypto.randomUUID(),
+      author: state.user.name || "Độc giả",
+      text: cleaned.slice(0, 800),
+      createdAt: new Date().toISOString()
+    },
+    ...(state.comments[key] || [])
+  ];
+  saveState();
+  toast("Đã gửi bình luận.");
+  return true;
+}
+
+function renderComments(storyId, chapterId = "story") {
+  const comments = getComments(storyId, chapterId);
+  const title = chapterId === "story" ? "Bình luận truyện" : "Bình luận chương";
+  return `
+    <section class="comments-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Cộng đồng</span>
+          <h2>${title}</h2>
+        </div>
+        <span class="status-chip">${comments.length} bình luận</span>
+      </div>
+      <form class="comment-form" data-comment-form="${storyId}" data-comment-chapter="${chapterId}">
+        <label>
+          <span>Viết bình luận</span>
+          <textarea name="comment" maxlength="800" placeholder="Chia sẻ cảm nghĩ của bạn..."></textarea>
+        </label>
+        <button class="btn btn-primary" type="submit">Gửi bình luận</button>
+      </form>
+      <div class="comment-list">
+        ${comments.map((comment) => `
+          <article class="comment-item">
+            <div class="comment-meta">
+              <strong>${comment.author}</strong>
+              <span>${new Date(comment.createdAt).toLocaleString("vi-VN")}</span>
+            </div>
+            <p>${escapeHtml(comment.text)}</p>
+          </article>
+        `).join("") || `<p class="muted">Chưa có bình luận nào. Bạn mở hàng đi.</p>`}
+      </div>
+    </section>
+  `;
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function getEpisodeTitle(chapterTitle) {
@@ -283,6 +357,7 @@ function renderStory(storyId) {
         <div class="chapter-list">
           ${filteredChapters.map((chapter) => chapterRow(story.id, chapter)).join("") || emptyState("Không có chương phù hợp.")}
         </div>
+        ${renderComments(story.id)}
       </div>
     </section>
   `;
@@ -340,6 +415,7 @@ function renderReader(storyId, chapterId) {
         ${prev ? `<a class="btn btn-secondary" href="#/read/${story.id}/${prev.id}">Chương trước</a>` : "<span></span>"}
         ${next ? `<a class="btn btn-primary" href="#/read/${story.id}/${next.id}">Chương sau</a>` : "<span></span>"}
       </div>
+      ${renderComments(story.id, chapter.id)}
     </article>
   `;
 }
@@ -538,6 +614,19 @@ document.addEventListener("click", (event) => {
     const text = els.checkout.querySelector(".qr-box span")?.textContent || "";
     navigator.clipboard?.writeText(text);
     toast("Đã copy mã đơn demo.");
+  }
+});
+
+document.addEventListener("submit", (event) => {
+  const form = event.target.closest("[data-comment-form]");
+  if (!form) return;
+  event.preventDefault();
+  const storyId = form.dataset.commentForm;
+  const chapterId = form.dataset.commentChapter || "story";
+  const input = form.elements.comment;
+  if (addComment(storyId, chapterId, input.value)) {
+    if (chapterId === "story") renderStory(storyId);
+    else route();
   }
 });
 
