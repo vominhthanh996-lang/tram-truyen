@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://raw.githack.com/vominhthanh996-lang/story_ThanhMV/main/doc-truyen-vip/sitemap.xml
