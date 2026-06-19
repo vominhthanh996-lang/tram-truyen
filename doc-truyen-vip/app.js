@@ -305,6 +305,7 @@ function storyCard(story) {
       <div class="story-body">
         <div class="tags">${story.genre.map((tag) => `<span class="tag">${tag}</span>`).join("")}</div>
         <h3>${story.title}</h3>
+        <div class="story-meta">${story.author} · ${story.reads.toLocaleString("vi-VN")} lượt đọc · ${story.rating}/5</div>
         <p>${story.summary}</p>
         <div class="progress-bar" aria-label="Tiến độ mở khóa">
           <span style="width:${progress}%"></span>
@@ -329,7 +330,12 @@ function renderHome() {
       <div class="hero-main">
         <span class="eyebrow">Truyện phế thổ đang đăng</span>
         <h1>Phế Thổ: Ta Nhặt Được Cả Thế Giới</h1>
-        <p>Đọc truyện tiếng Việt có dấu, giao diện dễ đọc, lưu chương đang đọc, mở chương bằng xu hoặc VIP 30 ngày. Thanh toán hiện vẫn là bản mô phỏng payOS/VietQR.</p>
+        <p>Thư viện đọc truyện tiếng Việt có dấu, tối ưu cho đọc dài, lưu chương đang đọc và mở khóa chương VIP bằng xu hoặc gói tháng.</p>
+        <div class="hero-kpis">
+          <span>${lastStory.chapters.length} chương</span>
+          <span>${lastStory.reads.toLocaleString("vi-VN")} lượt đọc</span>
+          <span>${lastStory.rating}/5 đánh giá</span>
+        </div>
         <div class="hero-actions">
           <a class="btn btn-primary" href="#/read/${lastStory.id}/${lastChapter.id}">Đọc tiếp</a>
           <a class="btn btn-secondary" href="#/story/${lastStory.id}">Danh sách chương</a>
@@ -340,6 +346,10 @@ function renderHome() {
         <span class="eyebrow">Đang đọc</span>
         <h2>${lastChapter.title}</h2>
         <p class="muted">${lastStory.title}</p>
+        <a class="reading-strip" href="#/read/${lastStory.id}/${lastChapter.id}">
+          <span>Tiếp tục đọc</span>
+          <strong>${lastChapter.title}</strong>
+        </a>
         <div class="metrics-grid">
           <div class="metric"><span class="muted">Xu</span><strong>${state.user.coins}</strong></div>
           <div class="metric"><span class="muted">VIP</span><strong>${isVip() ? "Có" : "Chưa"}</strong></div>
