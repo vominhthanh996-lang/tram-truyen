@@ -15,6 +15,13 @@ const els = {
 const storageKey = "doctruyen_vip_state_v1";
 let state = loadState();
 let activeRouteHash = "";
+let speechState = {
+  key: "",
+  chunks: [],
+  index: 0,
+  playing: false,
+  paused: false
+};
 const supabaseConfig = window.SUPABASE_CONFIG || {};
 const sharedCommentsEnabled = Boolean(
   supabaseConfig.url &&
@@ -66,6 +73,109 @@ function normalizeText(value) {
 
 function clampReaderSize(value) {
   return Math.min(24, Math.max(16, Number(value) || 19));
+}
+
+function getSpeech() {
+  return window.speechSynthesis || null;
+}
+
+function audioKey(storyId, chapterId) {
+  return `${storyId}:${chapterId}`;
+}
+
+function chapterAudioUrl(chapter) {
+  return chapter.audioUrl || chapter.audio || "";
+}
+
+function splitSpeechChunks(chapter) {
+  const chunks = chapter.body
+    .map((paragraph) => normalizeText(paragraph).trim())
+    .filter(Boolean);
+  const result = [];
+  let current = "";
+
+  chunks.forEach((paragraph) => {
+    if ((current + "\n\n" + paragraph).length > 900 && current) {
+      result.push(current);
+      current = paragraph;
+    } else {
+      current = current ? `${current}\n\n${paragraph}` : paragraph;
+    }
+  });
+
+  if (current) result.push(current);
+  return result;
+}
+
+function stopSpeech() {
+  const speech = getSpeech();
+  if (speech) speech.cancel();
+  speechState = { key: "", chunks: [], index: 0, playing: false, paused: false };
+  updateAudioStatus("Đã dừng nghe.");
+}
+
+function speakNextChunk() {
+  const speech = getSpeech();
+  if (!speech || !speechState.playing || speechState.paused) return;
+  const text = speechState.chunks[speechState.index];
+  if (!text) {
+    speechState = { ...speechState, playing: false, paused: false, index: 0 };
+    updateAudioStatus("Đã nghe hết chương.");
+    return;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "vi-VN";
+  utterance.rate = 0.96;
+  utterance.pitch = 1;
+  utterance.onend = () => {
+    speechState.index += 1;
+    speakNextChunk();
+  };
+  utterance.onerror = () => {
+    speechState.playing = false;
+    updateAudioStatus("Trình duyệt không đọc được chương này.");
+  };
+  updateAudioStatus(`Đang nghe đoạn ${speechState.index + 1}/${speechState.chunks.length}...`);
+  speech.speak(utterance);
+}
+
+function startSpeech(storyId, chapter) {
+  const speech = getSpeech();
+  if (!speech) {
+    toast("Trình duyệt này chưa hỗ trợ đọc audio tự động.");
+    return;
+  }
+
+  const key = audioKey(storyId, chapter.id);
+  speech.cancel();
+  speechState = {
+    key,
+    chunks: splitSpeechChunks(chapter),
+    index: 0,
+    playing: true,
+    paused: false
+  };
+  speakNextChunk();
+}
+
+function toggleSpeechPause() {
+  const speech = getSpeech();
+  if (!speech || !speechState.playing) return;
+  if (speechState.paused) {
+    speechState.paused = false;
+    speech.resume();
+    updateAudioStatus("Tiếp tục nghe...");
+  } else {
+    speechState.paused = true;
+    speech.pause();
+    updateAudioStatus("Đã tạm dừng.");
+  }
+}
+
+function updateAudioStatus(message) {
+  const status = document.querySelector("[data-audio-status]");
+  if (status) status.textContent = message;
 }
 
 function money(value) {
@@ -433,7 +543,7 @@ function renderStory(storyId) {
     <section class="story-detail">
       <div class="detail-cover" style="background:${story.cover}">
         <div>
-          <span class="eyebrow" style="color:#fff">DocTruyen VIP</span>
+          <span class="eyebrow" style="color:#fff">Trạm Truyện</span>
           <h1>${story.title}</h1>
         </div>
       </div>
@@ -490,6 +600,31 @@ function chapterRow(storyId, chapter) {
   `;
 }
 
+function renderAudioPanel(story, chapter, readable) {
+  if (!readable) return "";
+  const audioUrl = chapterAudioUrl(chapter);
+  const nativePlayer = audioUrl
+    ? `<audio controls preload="metadata" src="${escapeHtml(audioUrl)}"></audio>`
+    : "";
+
+  return `
+    <section class="audio-panel" data-audio-panel="${story.id}:${chapter.id}">
+      <div>
+        <span class="eyebrow">Nghe truyện</span>
+        <h2>Audio chương này</h2>
+        <p class="muted">Bấm nghe để trình duyệt đọc chương bằng giọng tiếng Việt. Khi có file MP3 tạo sẵn, web sẽ ưu tiên phát file upload.</p>
+      </div>
+      ${nativePlayer}
+      <div class="audio-actions">
+        <button class="btn btn-primary" data-speak-chapter="${story.id}:${chapter.id}">Nghe chương</button>
+        <button class="btn btn-secondary" data-pause-speech>Tạm dừng / tiếp tục</button>
+        <button class="btn btn-secondary" data-stop-speech>Dừng</button>
+      </div>
+      <p class="audio-status" data-audio-status>Chưa phát audio.</p>
+    </section>
+  `;
+}
+
 function renderReader(storyId, chapterId) {
   const story = getStory(storyId);
   const chapter = getChapter(storyId, chapterId);
@@ -521,7 +656,7 @@ function renderReader(storyId, chapterId) {
       </div>
       ${
         readable
-          ? `<section class="reader-content">${chapter.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`
+          ? `${renderAudioPanel(story, chapter, readable)}<section class="reader-content">${chapter.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`
           : paywallBlock(storyId, chapter)
       }
       <div class="reader-toolbar" style="margin-top:18px; position:static">
@@ -587,10 +722,10 @@ function renderAdmin() {
   els.view.innerHTML = `
     <div class="page-title">
       <div>
-        <span class="eyebrow">Admin demo</span>
+        <span class="eyebrow">Quản trị</span>
         <h1>Vận hành nội dung</h1>
       </div>
-      <button class="btn btn-danger" id="resetDemo">Reset demo</button>
+      <button class="btn btn-danger" id="resetDemo">Làm mới dữ liệu thử</button>
     </div>
     <section class="metrics-grid">
       <div class="metric"><span class="muted">Tổng truyện</span><strong>${stories.length}</strong></div>
@@ -620,15 +755,15 @@ function openCheckout(planId) {
   if (!plan) return;
   const orderCode = `DTV${Date.now().toString().slice(-8)}`;
   els.checkout.innerHTML = `
-    <span class="eyebrow">payOS / VietQR demo</span>
+    <span class="eyebrow">VietQR / payOS</span>
     <h2 id="checkoutTitle">${plan.title}</h2>
     <p class="muted">${plan.description}</p>
-    <div class="qr-box" aria-label="Mã QR thanh toán demo"><span>${orderCode}</span></div>
+    <div class="qr-box" aria-label="Mã QR thanh toán"><span>${orderCode}</span></div>
     <p><strong>Số tiền:</strong> ${money(plan.price)}</p>
     <p><strong>Nội dung:</strong> ${orderCode} ${plan.id}</p>
-    <p class="muted">Bản thật sẽ gọi API payOS để tạo payment link/QR và dùng webhook để kích hoạt gói sau khi thanh toán.</p>
+    <p class="muted">Cổng thanh toán đang ở chế độ thử nghiệm. Khi nối payOS thật, hệ thống sẽ tự kích hoạt gói sau khi ngân hàng xác nhận.</p>
     <div class="paywall-actions">
-      <button class="btn btn-primary" data-confirm-payment="${plan.id}">Mô phỏng đã thanh toán</button>
+      <button class="btn btn-primary" data-confirm-payment="${plan.id}">Xác nhận thanh toán thử</button>
       <button class="btn btn-secondary" id="copyOrderCode">Copy mã đơn</button>
     </div>
   `;
@@ -677,6 +812,7 @@ function toast(message) {
 function route() {
   const hash = location.hash.replace(/^#/, "") || "/";
   const shouldScrollTop = hash !== activeRouteHash;
+  if (shouldScrollTop) stopSpeech();
   activeRouteHash = hash;
   const [_, routeName, id, chapterId] = hash.split("/");
   document.body.classList.toggle("reader-dark", state.darkReader && routeName === "read");
@@ -714,6 +850,21 @@ document.addEventListener("click", (event) => {
     route();
   }
 
+  const speakButton = event.target.closest("[data-speak-chapter]");
+  if (speakButton) {
+    const [storyId, chapterId] = speakButton.dataset.speakChapter.split(":");
+    const chapter = getChapter(storyId, chapterId);
+    if (chapter) startSpeech(storyId, chapter);
+  }
+
+  if (event.target.closest("[data-pause-speech]")) {
+    toggleSpeechPause();
+  }
+
+  if (event.target.closest("[data-stop-speech]")) {
+    stopSpeech();
+  }
+
   if (event.target.id === "toggleReaderTheme") {
     state.darkReader = !state.darkReader;
     saveState();
@@ -723,14 +874,14 @@ document.addEventListener("click", (event) => {
   if (event.target.id === "resetDemo") {
     localStorage.removeItem(storageKey);
     state = loadState();
-    toast("Đã reset dữ liệu demo.");
+    toast("Đã làm mới dữ liệu thử.");
     route();
   }
 
   if (event.target.id === "copyOrderCode") {
     const text = els.checkout.querySelector(".qr-box span")?.textContent || "";
     navigator.clipboard?.writeText(text);
-    toast("Đã copy mã đơn demo.");
+    toast("Đã copy mã đơn.");
   }
 });
 

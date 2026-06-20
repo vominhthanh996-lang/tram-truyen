@@ -1,4 +1,4 @@
-# DocTruyen VIP MVP
+# Trạm Truyện MVP
 
 Static MVP cho web đọc truyện thu phí ở Việt Nam.
 
@@ -6,16 +6,28 @@ Static MVP cho web đọc truyện thu phí ở Việt Nam.
 
 Mở `index.html` bằng trình duyệt.
 
+## Tên Miền Production
+
+GitHub Pages hiện dùng URL mặc định của repo. Muốn chuyên nghiệp hơn cần mua hoặc trỏ một domain riêng, ví dụ `tramtruyen.vn` hoặc `truyen.thanhmv.com`.
+
+Các bước khi đã có domain:
+
+1. Tạo file `CNAME` trong `doc-truyen-vip/` chứa đúng domain.
+2. Trỏ DNS của domain về GitHub Pages.
+3. Bật HTTPS trong Settings -> Pages.
+
 ## Tính năng có sẵn
 
 - Trang chủ, thư viện, trang chi tiết truyện, reader mode.
 - Chương miễn phí và chương khóa.
 - VIP 30 ngày hoặc mở chương bằng xu.
-- Checkout payOS/VietQR mock: bấm "Mô phỏng đã thanh toán" để kích hoạt gói.
+- Reader tiếng Việt rõ dấu trên desktop/mobile, có nền sáng/nền tối.
+- Mỗi chương có khu vực nghe audio: ưu tiên file MP3 nếu đã upload, nếu chưa có thì dùng giọng đọc của trình duyệt.
+- Checkout payOS/VietQR ở chế độ thử nghiệm: bấm "Xác nhận thanh toán thử" để kích hoạt gói trên máy hiện tại.
 - Bình luận ở trang truyện và từng chương.
 - Nếu đã cấu hình Supabase, bình luận sẽ đồng bộ chung cho mọi độc giả.
 - Lưu ví xu, VIP, chương đã mở và lịch sử giao dịch bằng `localStorage`.
-- Admin demo để xem tổng truyện, chương khóa, giao dịch.
+- Trang quản trị nội bộ để xem tổng truyện, chương khóa, giao dịch.
 
 ## Bật Bình Luận Chung Bằng Supabase
 
@@ -32,6 +44,24 @@ window.SUPABASE_CONFIG = {
 ```
 
 Khi hai giá trị này có thật, web sẽ dùng Supabase REST API để đọc/ghi bình luận chung.
+
+## Tạo Audio Cho Chương
+
+Nghe nhanh trên web dùng Web Speech API của trình duyệt. Muốn upload file MP3 thật cho từng chương thì chạy:
+
+```powershell
+python tools/generate_chapter_audio.py --chapter c001
+python tools/build_doc_truyen_data.py
+```
+
+Tạo toàn bộ chương:
+
+```powershell
+python tools/generate_chapter_audio.py --all
+python tools/build_doc_truyen_data.py
+```
+
+File MP3 sẽ nằm trong `doc-truyen-vip/audio/`. Khi file `audio/c001.mp3` tồn tại, `build_doc_truyen_data.py` sẽ tự gắn `audioUrl` vào chương `c001`, và trang đọc sẽ hiện player MP3.
 
 ## Nâng Cấp Lên Bản Thật
 

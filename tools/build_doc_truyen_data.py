@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path("phe-tho-ta-nhat-duoc-ca-the-gioi")
 OUT = Path("doc-truyen-vip/data.js")
+AUDIO_DIR = Path("doc-truyen-vip/audio")
 
 
 def natural_key(path: Path):
@@ -49,15 +50,18 @@ def build():
         tap_title = clean_title(tap_slug)
         phan_title = title_from_text(text, clean_title(path.stem))
 
-        chapters.append(
-            {
-                "id": f"c{idx:03d}",
-                "title": f"Tập {tap_no:02d}: {tap_title} - {phan_title}",
-                "free": idx <= 5,
-                "price": 0 if idx <= 5 else 8,
-                "body": markdown_blocks(text),
-            }
-        )
+        chapter_id = f"c{idx:03d}"
+        chapter = {
+            "id": chapter_id,
+            "title": f"Tập {tap_no:02d}: {tap_title} - {phan_title}",
+            "free": idx <= 5,
+            "price": 0 if idx <= 5 else 8,
+            "body": markdown_blocks(text),
+        }
+        audio_path = AUDIO_DIR / f"{chapter_id}.mp3"
+        if audio_path.exists():
+            chapter["audioUrl"] = f"audio/{chapter_id}.mp3"
+        chapters.append(chapter)
 
     data = {
         "plans": [
