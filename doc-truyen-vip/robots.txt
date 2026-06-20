@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vominhthanh996-lang.github.io/tram-truyen/sitemap.xml
+Sitemap: https://vominhthanh996-lang.github.io/truyen-2k/sitemap.xml

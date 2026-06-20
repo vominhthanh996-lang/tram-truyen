@@ -543,7 +543,7 @@ function renderStory(storyId) {
     <section class="story-detail">
       <div class="detail-cover" style="background:${story.cover}">
         <div>
-          <span class="eyebrow" style="color:#fff">Trạm Truyện</span>
+          <span class="eyebrow" style="color:#fff">Truyện 2K</span>
           <h1>${story.title}</h1>
         </div>
       </div>

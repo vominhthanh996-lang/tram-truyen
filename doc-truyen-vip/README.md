@@ -1,4 +1,4 @@
-# Trạm Truyện MVP
+# Truyện 2K MVP
 
 Static MVP cho web đọc truyện thu phí ở Việt Nam.
 
@@ -8,7 +8,7 @@ Mở `index.html` bằng trình duyệt.
 
 ## Tên Miền Production
 
-GitHub Pages hiện dùng URL mặc định của repo. Muốn chuyên nghiệp hơn cần mua hoặc trỏ một domain riêng, ví dụ `tramtruyen.vn` hoặc `truyen.thanhmv.com`.
+GitHub Pages hiện dùng URL mặc định của repo. Muốn mất hẳn `github.io` và tên tài khoản GitHub thì cần mua hoặc trỏ một domain riêng, ví dụ `truyen2k.vn`, `truyen2k.com`, hoặc `doc.truyen2k.vn`.
 
 Các bước khi đã có domain:
 
