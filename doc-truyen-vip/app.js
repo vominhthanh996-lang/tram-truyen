@@ -51,6 +51,7 @@ const audioVoicePresets = [
   }
 ];
 const audioSpeedOptions = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
+const preferGeneratedMp3 = false;
 let state = loadState();
 let activeRouteHash = "";
 let speechState = {
@@ -142,6 +143,7 @@ function audioKey(storyId, chapterId) {
 }
 
 function chapterAudioUrl(chapter, voiceId = selectedAudioVoice()) {
+  if (!preferGeneratedMp3) return "";
   const urls = chapter.audioUrls || {};
   return urls[voiceId] || (voiceId === "nu-cam-xuc" ? chapter.audioUrl || chapter.audio || "" : "");
 }
@@ -816,7 +818,7 @@ function renderAudioPanel(story, chapter, readable, prev, next) {
     : "";
   const modeText = audioUrl
     ? `Đang có MP3 gen sẵn cho giọng ${voiceLabel}. Player bên dưới kéo tua qua lại được.`
-    : `Giọng ${voiceLabel} sẽ đọc trực tiếp trên trình duyệt cho chương này. Khi có MP3 gen sẵn, web sẽ tự ưu tiên file MP3.`;
+    : `Giọng ${voiceLabel} sẽ đọc trực tiếp từ nội dung chương đang mở, nên không bị lệch sang chương khác.`;
 
   return `
     <section class="audio-panel" data-audio-panel="${story.id}:${chapter.id}">
