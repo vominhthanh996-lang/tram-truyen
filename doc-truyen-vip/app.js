@@ -14,11 +14,41 @@ const els = {
 
 const storageKey = "doctruyen_vip_state_v1";
 const audioVoicePresets = [
-  { id: "nu-cam-xuc", label: "Nữ cảm xúc" },
-  { id: "nam-tram", label: "Nam trầm" },
-  { id: "nu-cham-am", label: "Nữ chậm ấm" },
-  { id: "nam-cang-thang", label: "Nam căng thẳng" },
-  { id: "nu-nhe-nhang", label: "Nữ nhẹ" }
+  {
+    id: "nu-cam-xuc",
+    label: "Nữ cảm xúc",
+    voiceMatch: /hoai|my|female|woman|natural/i,
+    fallbackRate: 1,
+    fallbackPitch: 1.08
+  },
+  {
+    id: "nam-tram",
+    label: "Nam trầm",
+    voiceMatch: /nam|minh|male|man|natural/i,
+    fallbackRate: 0.92,
+    fallbackPitch: 0.78
+  },
+  {
+    id: "nu-cham-am",
+    label: "Nữ chậm ấm",
+    voiceMatch: /hoai|my|female|woman|natural/i,
+    fallbackRate: 0.86,
+    fallbackPitch: 0.96
+  },
+  {
+    id: "nam-cang-thang",
+    label: "Nam căng thẳng",
+    voiceMatch: /nam|minh|male|man|natural/i,
+    fallbackRate: 1.08,
+    fallbackPitch: 0.92
+  },
+  {
+    id: "nu-nhe-nhang",
+    label: "Nữ nhẹ",
+    voiceMatch: /hoai|my|female|woman|natural/i,
+    fallbackRate: 0.96,
+    fallbackPitch: 1.18
+  }
 ];
 const audioSpeedOptions = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
 let state = loadState();
@@ -99,6 +129,10 @@ function selectedAudioVoice() {
     : audioVoicePresets[0].id;
 }
 
+function selectedAudioVoiceProfile() {
+  return audioVoicePresets.find((voice) => voice.id === selectedAudioVoice()) || audioVoicePresets[0];
+}
+
 function selectedAudioSpeed() {
   return audioSpeedOptions.includes(Number(state.audioSpeed)) ? Number(state.audioSpeed) : 1;
 }
@@ -140,12 +174,12 @@ function stopSpeech() {
   updateAudioProgress(0, "0%");
 }
 
-function preferredVoice() {
+function preferredVoice(profile = selectedAudioVoiceProfile()) {
   const speech = getSpeech();
   if (!speech) return null;
   const voices = speech.getVoices();
   return (
-    voices.find((voice) => voice.lang === "vi-VN" && /hoai|my|female|natural/i.test(voice.name)) ||
+    voices.find((voice) => voice.lang === "vi-VN" && profile.voiceMatch.test(voice.name)) ||
     voices.find((voice) => voice.lang === "vi-VN") ||
     voices.find((voice) => voice.lang?.toLowerCase().startsWith("vi")) ||
     null
@@ -207,11 +241,12 @@ function speakNextChunk() {
   }
 
   const utterance = new SpeechSynthesisUtterance(text);
-  const voice = preferredVoice();
+  const profile = selectedAudioVoiceProfile();
+  const voice = preferredVoice(profile);
   if (voice) utterance.voice = voice;
   utterance.lang = "vi-VN";
-  utterance.rate = Math.min(1.5, Math.max(0.75, selectedAudioSpeed()));
-  utterance.pitch = 1;
+  utterance.rate = Math.min(1.5, Math.max(0.75, selectedAudioSpeed() * profile.fallbackRate));
+  utterance.pitch = Math.min(2, Math.max(0.5, profile.fallbackPitch));
   utterance.onstart = () => {
     speechState.chunkProgress = 0;
     updateAudioProgress();
@@ -781,7 +816,7 @@ function renderAudioPanel(story, chapter, readable, prev, next) {
     : "";
   const modeText = audioUrl
     ? `Đang có MP3 gen sẵn cho giọng ${voiceLabel}. Player bên dưới kéo tua qua lại được.`
-    : `Chưa có MP3 gen sẵn cho giọng ${voiceLabel}. Có thể dùng tạm giọng trình duyệt hoặc generate/upload file bằng script audio.`;
+    : `Giọng ${voiceLabel} sẽ đọc trực tiếp trên trình duyệt cho chương này. Khi có MP3 gen sẵn, web sẽ tự ưu tiên file MP3.`;
 
   return `
     <section class="audio-panel" data-audio-panel="${story.id}:${chapter.id}">
@@ -822,7 +857,7 @@ function renderAudioPanel(story, chapter, readable, prev, next) {
         <button class="btn btn-secondary" data-stop-speech>Dừng</button>
       </div>
       ${renderChapterNav(story, prev, next, "audio-chapter-nav")}
-      <p class="audio-status"><span data-audio-status>${audioUrl ? "Sẵn sàng phát MP3 gen sẵn." : "Chưa có MP3 cho preset này."}</span> <strong data-audio-progress-text>0%</strong></p>
+      <p class="audio-status"><span data-audio-status>${audioUrl ? "Sẵn sàng phát MP3 gen sẵn." : `Sẵn sàng đọc trực tiếp bằng giọng ${voiceLabel}.`}</span> <strong data-audio-progress-text>0%</strong></p>
     </section>
   `;
 }

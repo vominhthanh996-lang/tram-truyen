@@ -4144,7 +4144,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c011",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 1: Đường Ray Không Dẫn Về Nhà",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 1: Đường Ray Không Dẫn Về Nhà",
           "free": false,
           "price": 8,
           "body": [
@@ -4905,7 +4905,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c012",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 2: Ga Xám",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 2: Ga Xám",
           "free": false,
           "price": 8,
           "body": [
@@ -5301,7 +5301,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c013",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 3: Đoàn Thiết Oa",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 3: Đoàn Thiết Oa",
           "free": false,
           "price": 8,
           "body": [
@@ -5683,7 +5683,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c014",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 4: Đường Hầm Số 4",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 4: Đường Hầm Số 4",
           "free": false,
           "price": 8,
           "body": [
@@ -6025,7 +6025,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c015",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 5: Người Của Ngân Thụ",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 5: Người Của Ngân Thụ",
           "free": false,
           "price": 8,
           "body": [
@@ -6361,7 +6361,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c016",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 6: Căn Cứ Tạm",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 6: Căn Cứ Tạm",
           "free": false,
           "price": 8,
           "body": [
@@ -6684,7 +6684,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c017",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 7: La Kiêu Đuổi Tới",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 7: La Kiêu Đuổi Tới",
           "free": false,
           "price": 8,
           "body": [
@@ -7025,7 +7025,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c018",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 8: Thú Dưới Đường Hầm",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 8: Thú Dưới Đường Hầm",
           "free": false,
           "price": 8,
           "body": [
@@ -7355,7 +7355,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c019",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 9: Bản Đồ Đầy Đủ",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 9: Bản Đồ Đầy Đủ",
           "free": false,
           "price": 8,
           "body": [
@@ -7664,7 +7664,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c020",
-          "title": "Tập 02: Duong Ray Phia Nam - Phần 10: Rời Ga Xám",
+          "title": "Tập 02: Đường Ray Phía Nam - Phần 10: Rời Ga Xám",
           "free": false,
           "price": 8,
           "body": [
@@ -8016,7 +8016,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c021",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 1: Người Không Có Tên Trong Sổ",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 1: Người Không Có Tên Trong Sổ",
           "free": false,
           "price": 8,
           "body": [
@@ -8643,7 +8643,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c022",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 2: Sở Cư Trú Nam",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 2: Sở Cư Trú Nam",
           "free": false,
           "price": 8,
           "body": [
@@ -9053,7 +9053,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c023",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 3: Trạm Lọc Ba",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 3: Trạm Lọc Ba",
           "free": false,
           "price": 8,
           "body": [
@@ -9549,7 +9549,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c024",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 4: Xưởng Tinh Thạch Hạ Tầng",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 4: Xưởng Tinh Thạch Hạ Tầng",
           "free": false,
           "price": 8,
           "body": [
@@ -9913,7 +9913,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c025",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 5: Luật Trong Thành",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 5: Luật Trong Thành",
           "free": false,
           "price": 8,
           "body": [
@@ -10294,7 +10294,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c026",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 6: Dấu Hắc Nha",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 6: Dấu Hắc Nha",
           "free": false,
           "price": 8,
           "body": [
@@ -10674,7 +10674,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c027",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 7: Mười Hai Giờ Lao Dịch",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 7: Mười Hai Giờ Lao Dịch",
           "free": false,
           "price": 8,
           "body": [
@@ -11012,7 +11012,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c028",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 8: Nước Dành Cho Ai",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 8: Nước Dành Cho Ai",
           "free": false,
           "price": 8,
           "body": [
@@ -11405,7 +11405,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c029",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 9: Bão Bụi Đỏ",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 9: Bão Bụi Đỏ",
           "free": false,
           "price": 8,
           "body": [
@@ -11724,7 +11724,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c030",
-          "title": "Tập 03: Ben Trong Buc Tuong - Phần 10: Tấm Thẻ Đầu Tiên",
+          "title": "Tập 03: Bên Trong Bức Tường - Phần 10: Tấm Thẻ Đầu Tiên",
           "free": false,
           "price": 8,
           "body": [
@@ -12132,7 +12132,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c031",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 1: Người Áo Trắng Đến Kho Đèn Vàng",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 1: Người Áo Trắng Đến Kho Đèn Vàng",
           "free": false,
           "price": 8,
           "body": [
@@ -12550,7 +12550,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c032",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 2: Ba Ngày Chuộc Một Cái Tên Cũ",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 2: Ba Ngày Chuộc Một Cái Tên Cũ",
           "free": false,
           "price": 8,
           "body": [
@@ -12934,7 +12934,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c033",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 3: Đường Ống Phụ Dưới Thành",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 3: Đường Ống Phụ Dưới Thành",
           "free": false,
           "price": 8,
           "body": [
@@ -13131,7 +13131,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c034",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 4: Con Thú Uống Kim Loại",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 4: Con Thú Uống Kim Loại",
           "free": false,
           "price": 8,
           "body": [
@@ -13345,7 +13345,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c035",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 5: Người Trong Đội Biết Sợ",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 5: Người Trong Đội Biết Sợ",
           "free": false,
           "price": 8,
           "body": [
@@ -13596,7 +13596,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c036",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 6: Thẩm Bạch Đưa Ra Giá",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 6: Thẩm Bạch Đưa Ra Giá",
           "free": false,
           "price": 8,
           "body": [
@@ -13909,7 +13909,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c037",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 7: Phế Đô Cấm Khu Mở Cửa",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 7: Phế Đô Cấm Khu Mở Cửa",
           "free": false,
           "price": 8,
           "body": [
@@ -14164,7 +14164,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c038",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 8: Hắc Nha Chưa Chết Hết",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 8: Hắc Nha Chưa Chết Hết",
           "free": false,
           "price": 8,
           "body": [
@@ -14467,7 +14467,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c039",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 9: Thuốc Gen Trong Nhà Kính Chết",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 9: Thuốc Gen Trong Nhà Kính Chết",
           "free": false,
           "price": 8,
           "body": [
@@ -14770,7 +14770,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c040",
-          "title": "Tập 04: Phe Do Cam Khu - Phần 10: Ba Bước Đứng Dậy",
+          "title": "Tập 04: Phế Đô Cấm Khu - Phần 10: Ba Bước Đứng Dậy",
           "free": false,
           "price": 8,
           "body": [
@@ -15137,7 +15137,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c041",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 1: Khi Thành Bắt Đầu Khóa Cửa",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 1: Khi Thành Bắt Đầu Khóa Cửa",
           "free": false,
           "price": 8,
           "body": [
@@ -15523,7 +15523,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c042",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 2: Một Cốc Nước Có Tên Người Khác",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 2: Một Cốc Nước Có Tên Người Khác",
           "free": false,
           "price": 8,
           "body": [
@@ -16018,7 +16018,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c043",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 3: Bản Đồ Trạm Lọc Chết",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 3: Bản Đồ Trạm Lọc Chết",
           "free": false,
           "price": 8,
           "body": [
@@ -16480,7 +16480,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c044",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 4: Rời Thành Không Phải Trốn Chạy",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 4: Rời Thành Không Phải Trốn Chạy",
           "free": false,
           "price": 8,
           "body": [
@@ -16905,7 +16905,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c045",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 5: Những Người Đứng Ngoài Cổng",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 5: Những Người Đứng Ngoài Cổng",
           "free": false,
           "price": 8,
           "body": [
@@ -17299,7 +17299,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c046",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 6: Trạm Lọc Không Có Chủ",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 6: Trạm Lọc Không Có Chủ",
           "free": false,
           "price": 8,
           "body": [
@@ -17730,7 +17730,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c047",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 7: Con Cá Sấu Cống Ngầm",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 7: Con Cá Sấu Cống Ngầm",
           "free": false,
           "price": 8,
           "body": [
@@ -18276,7 +18276,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c048",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 8: Luật Đầu Tiên Của Chim Xám",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 8: Luật Đầu Tiên Của Chim Xám",
           "free": false,
           "price": 8,
           "body": [
@@ -18632,7 +18632,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c049",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 9: Thẩm Bạch Đem Tới Một Thành Phố",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 9: Thẩm Bạch Đem Tới Một Thành Phố",
           "free": false,
           "price": 8,
           "body": [
@@ -19052,7 +19052,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c050",
-          "title": "Tập 05: Thanh Moi Tren Phe Tho - Phần 10: Một Cái Cổng Mở Từ Bên Trong",
+          "title": "Tập 05: Thành Mới Trên Phế Thổ - Phần 10: Một Cái Cổng Mở Từ Bên Trong",
           "free": false,
           "price": 8,
           "body": [
@@ -19411,7 +19411,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c051",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 1: Ba Ngày Đầu Không Được Chết",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 1: Ba Ngày Đầu Không Được Chết",
           "free": false,
           "price": 8,
           "body": [
@@ -19829,7 +19829,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c052",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 2: Cổng Không Có Cánh",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 2: Cổng Không Có Cánh",
           "free": false,
           "price": 8,
           "body": [
@@ -20167,7 +20167,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c053",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 3: Than Sạch Và Than Giả",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 3: Than Sạch Và Than Giả",
           "free": false,
           "price": 8,
           "body": [
@@ -20403,7 +20403,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c054",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 4: Người Bệnh Không Xếp Cuối",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 4: Người Bệnh Không Xếp Cuối",
           "free": false,
           "price": 8,
           "body": [
@@ -20682,7 +20682,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c055",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 5: Đêm Cướp Nước Đầu Tiên",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 5: Đêm Cướp Nước Đầu Tiên",
           "free": false,
           "price": 8,
           "body": [
@@ -21020,7 +21020,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c056",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 6: Con Thú Có Thẻ Bạc",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 6: Con Thú Có Thẻ Bạc",
           "free": false,
           "price": 8,
           "body": [
@@ -21305,7 +21305,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c057",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 7: Ai Được Gọi Là Người Trạm",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 7: Ai Được Gọi Là Người Trạm",
           "free": false,
           "price": 8,
           "body": [
@@ -21587,7 +21587,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c058",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 8: Một Bát Nước Bị Đánh Cắp",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 8: Một Bát Nước Bị Đánh Cắp",
           "free": false,
           "price": 8,
           "body": [
@@ -21816,7 +21816,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c059",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 9: Giấy Xử Lý Dịch",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 9: Giấy Xử Lý Dịch",
           "free": false,
           "price": 8,
           "body": [
@@ -22113,7 +22113,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c060",
-          "title": "Tập 06: Giu Cong Tram So Chin - Phần 10: Cổng Đóng Vì Người Bên Trong",
+          "title": "Tập 06: Giữ Cổng Trạm Số Chín - Phần 10: Cổng Đóng Vì Người Bên Trong",
           "free": false,
           "price": 8,
           "body": [
@@ -22366,7 +22366,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c061",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 1: Bảy Ngày Bị Khoanh Đỏ",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 1: Bảy Ngày Bị Khoanh Đỏ",
           "free": false,
           "price": 8,
           "body": [
@@ -22688,7 +22688,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c062",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 2: Chợ Đến Trước Tường",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 2: Chợ Đến Trước Tường",
           "free": false,
           "price": 8,
           "body": [
@@ -23010,7 +23010,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c063",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 3: Một Cân Than Không Mua Được Công Bằng",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 3: Một Cân Than Không Mua Được Công Bằng",
           "free": false,
           "price": 8,
           "body": [
@@ -23242,7 +23242,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c064",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 4: Tin Nước Gây Bệnh",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 4: Tin Nước Gây Bệnh",
           "free": false,
           "price": 8,
           "body": [
@@ -23472,7 +23472,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c065",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 5: Người Hận Đứng Giữ Cổng",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 5: Người Hận Đứng Giữ Cổng",
           "free": false,
           "price": 8,
           "body": [
@@ -23714,7 +23714,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c066",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 6: Thuế Nước Đầu Tiên",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 6: Thuế Nước Đầu Tiên",
           "free": false,
           "price": 8,
           "body": [
@@ -23925,7 +23925,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c067",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 7: Đêm Bột Vàng Bị Cướp",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 7: Đêm Bột Vàng Bị Cướp",
           "free": false,
           "price": 8,
           "body": [
@@ -24133,7 +24133,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c068",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 8: Giấy Chủ Quyền Trong Bùn",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 8: Giấy Chủ Quyền Trong Bùn",
           "free": false,
           "price": 8,
           "body": [
@@ -24354,7 +24354,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c069",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 9: Bảy Ngày Chưa Đủ Thành Nhà",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 9: Bảy Ngày Chưa Đủ Thành Nhà",
           "free": false,
           "price": 8,
           "body": [
@@ -24583,7 +24583,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c070",
-          "title": "Tập 07: Bay Ngay Co Lap - Phần 10: Một Lá Cờ Không Sạch",
+          "title": "Tập 07: Bảy Ngày Cô Lập - Phần 10: Một Lá Cờ Không Sạch",
           "free": false,
           "price": 8,
           "body": [
@@ -24823,7 +24823,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c071",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 1: Sáu Giờ Để Rời Đi",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 1: Sáu Giờ Để Rời Đi",
           "free": false,
           "price": 8,
           "body": [
@@ -25030,7 +25030,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c072",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 2: Tên Tần Sách Không Được Đọc To",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 2: Tên Tần Sách Không Được Đọc To",
           "free": false,
           "price": 8,
           "body": [
@@ -25255,7 +25255,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c073",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 3: Lao Động Tạm Trú",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 3: Lao Động Tạm Trú",
           "free": false,
           "price": 8,
           "body": [
@@ -25509,7 +25509,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c074",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 4: Một Chữ Ký Có Mùi Thuốc Sát Trùng",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 4: Một Chữ Ký Có Mùi Thuốc Sát Trùng",
           "free": false,
           "price": 8,
           "body": [
@@ -25700,7 +25700,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c075",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 5: Trạm Ghi Số 12",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 5: Trạm Ghi Số 12",
           "free": false,
           "price": 8,
           "body": [
@@ -25906,7 +25906,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c076",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 6: Người Cũ Của Hắc Nha",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 6: Người Cũ Của Hắc Nha",
           "free": false,
           "price": 8,
           "body": [
@@ -26148,7 +26148,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c077",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 7: Hợp Đồng Bằng Nước",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 7: Hợp Đồng Bằng Nước",
           "free": false,
           "price": 8,
           "body": [
@@ -26337,7 +26337,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c078",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 8: Bản Ghi Trong Máy Chết",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 8: Bản Ghi Trong Máy Chết",
           "free": false,
           "price": 8,
           "body": [
@@ -26554,7 +26554,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c079",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 9: Tần Dã Kể Một Nửa",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 9: Tần Dã Kể Một Nửa",
           "free": false,
           "price": 8,
           "body": [
@@ -26801,7 +26801,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c080",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 10: Người Chết Trả Lời",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 10: Người Chết Trả Lời",
           "free": false,
           "price": 8,
           "body": [
@@ -26937,7 +26937,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c081",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 11: Đêm Nghe Người Chết Nói Nhỏ",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 11: Đêm Nghe Người Chết Nói Nhỏ",
           "free": false,
           "price": 8,
           "body": [
@@ -27107,7 +27107,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c082",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 12: Sáng Sau Giấy Chưa Khô",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 12: Sáng Sau Giấy Chưa Khô",
           "free": false,
           "price": 8,
           "body": [
@@ -27273,7 +27273,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c083",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 13: Người Đã Ký Quay Lại",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 13: Người Đã Ký Quay Lại",
           "free": false,
           "price": 8,
           "body": [
@@ -27437,7 +27437,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c084",
-          "title": "Tập 08: Nguoi Chet Ky Ten - Phần 14: Khóa Cổng Trước Tập Sau",
+          "title": "Tập 08: Người Chết Ký Tên - Phần 14: Khóa Cổng Trước Tập Sau",
           "free": false,
           "price": 8,
           "body": [
@@ -27633,7 +27633,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c085",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 1: Người Mang Bình Nước",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 1: Người Mang Bình Nước",
           "free": false,
           "price": 8,
           "body": [
@@ -28007,7 +28007,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c086",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 2: Đường Không Có Cờ",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 2: Đường Không Có Cờ",
           "free": false,
           "price": 8,
           "body": [
@@ -28481,7 +28481,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c087",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 3: Bạt Kín Sau Xe Đen",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 3: Bạt Kín Sau Xe Đen",
           "free": false,
           "price": 8,
           "body": [
@@ -28782,7 +28782,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c088",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 4: Chó Rêu Khô Săn Mùi Nước",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 4: Chó Rêu Khô Săn Mùi Nước",
           "free": false,
           "price": 8,
           "body": [
@@ -29269,7 +29269,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c089",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 5: Tọa Độ Dưới Cầu Gãy",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 5: Tọa Độ Dưới Cầu Gãy",
           "free": false,
           "price": 8,
           "body": [
@@ -29704,7 +29704,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c090",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 6: Người Không Dám Nói Tên Tần Sách",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 6: Người Không Dám Nói Tên Tần Sách",
           "free": false,
           "price": 8,
           "body": [
@@ -30186,7 +30186,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c091",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 7: Bình Nước Bị Đổi",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 7: Bình Nước Bị Đổi",
           "free": false,
           "price": 8,
           "body": [
@@ -30640,7 +30640,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c092",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 8: HN-07 Không Nhận Lệnh",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 8: HN-07 Không Nhận Lệnh",
           "free": false,
           "price": 8,
           "body": [
@@ -31138,7 +31138,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c093",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 9: Nước Đục Qua Máy Sạch",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 9: Nước Đục Qua Máy Sạch",
           "free": false,
           "price": 8,
           "body": [
@@ -31488,7 +31488,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c094",
-          "title": "Tập 09: Nuoc Xam Khong Mang Co - Phần 10: Không Mang Cờ Vẫn Có Người Nhận Ra",
+          "title": "Tập 09: Nước Xám Không Mang Cờ - Phần 10: Không Mang Cờ Vẫn Có Người Nhận Ra",
           "free": false,
           "price": 8,
           "body": [
@@ -32009,7 +32009,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c095",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 1: Tên Đầu Tiên Ngoài Cổng",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 1: Tên Đầu Tiên Ngoài Cổng",
           "free": false,
           "price": 8,
           "body": [
@@ -32285,7 +32285,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c096",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 2: Một Cái Tên Giá Nửa Bát Nước",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 2: Một Cái Tên Giá Nửa Bát Nước",
           "free": false,
           "price": 8,
           "body": [
@@ -32709,7 +32709,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c097",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 3: Ruồi Xương Trên Mương Cạn",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 3: Ruồi Xương Trên Mương Cạn",
           "free": false,
           "price": 8,
           "body": [
@@ -33075,7 +33075,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c098",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 4: Người Giả Mang Tên Thật",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 4: Người Giả Mang Tên Thật",
           "free": false,
           "price": 8,
           "body": [
@@ -33444,7 +33444,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c099",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 5: Phiếu Nước Sạch Thành Nam",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 5: Phiếu Nước Sạch Thành Nam",
           "free": false,
           "price": 8,
           "body": [
@@ -33776,7 +33776,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c100",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 6: A Thất Ghi Sai Một Chữ",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 6: A Thất Ghi Sai Một Chữ",
           "free": false,
           "price": 8,
           "body": [
@@ -34095,7 +34095,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c101",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 7: Tiếng Loa Dưới Đất",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 7: Tiếng Loa Dưới Đất",
           "free": false,
           "price": 8,
           "body": [
@@ -34512,7 +34512,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c102",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 8: Không Ai Được Làm Sổ Một Mình",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 8: Không Ai Được Làm Sổ Một Mình",
           "free": false,
           "price": 8,
           "body": [
@@ -34830,7 +34830,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c103",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 9: Xe Đen Không Đi Qua Cổng",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 9: Xe Đen Không Đi Qua Cổng",
           "free": false,
           "price": 8,
           "body": [
@@ -35138,7 +35138,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c104",
-          "title": "Tập 10: Danh Sach Nguoi Con Ten - Phần 10: Danh Sách Bắt Đầu Có Người Ký",
+          "title": "Tập 10: Danh Sách Người Còn Tên - Phần 10: Danh Sách Bắt Đầu Có Người Ký",
           "free": false,
           "price": 8,
           "body": [
@@ -35442,7 +35442,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c105",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 1: Thuốc Treo Trên Bảng Sạch",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 1: Thuốc Treo Trên Bảng Sạch",
           "free": false,
           "price": 8,
           "body": [
@@ -35646,7 +35646,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c106",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 2: Người Muốn Tự Nộp Mình",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 2: Người Muốn Tự Nộp Mình",
           "free": false,
           "price": 8,
           "body": [
@@ -35937,7 +35937,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c107",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 3: Chợ Thuốc Rìa Bắc",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 3: Chợ Thuốc Rìa Bắc",
           "free": false,
           "price": 8,
           "body": [
@@ -36233,7 +36233,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c108",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 4: Mùi Gen Sụp Trong Gió Đỏ",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 4: Mùi Gen Sụp Trong Gió Đỏ",
           "free": false,
           "price": 8,
           "body": [
@@ -36458,7 +36458,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c109",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 5: Thuốc Một Tháng Hay Xiềng Một Tháng",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 5: Thuốc Một Tháng Hay Xiềng Một Tháng",
           "free": false,
           "price": 8,
           "body": [
@@ -36718,7 +36718,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c110",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 6: Người Hắc Nha Không Đeo Dấu",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 6: Người Hắc Nha Không Đeo Dấu",
           "free": false,
           "price": 8,
           "body": [
@@ -37012,7 +37012,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c111",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 7: Không Ai Ký Thay Thân Thể Người Khác",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 7: Không Ai Ký Thay Thân Thể Người Khác",
           "free": false,
           "price": 8,
           "body": [
@@ -37369,7 +37369,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c112",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 8: Lõi Thú Không Ăn Được",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 8: Lõi Thú Không Ăn Được",
           "free": false,
           "price": 8,
           "body": [
@@ -37820,7 +37820,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c113",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 9: Một Liều Kéo Dài Đường",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 9: Một Liều Kéo Dài Đường",
           "free": false,
           "price": 8,
           "body": [
@@ -38271,7 +38271,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c114",
-          "title": "Tập 11: Thuoc Khong Doi Nguoi - Phần 10: Thuốc Không Mua Được Người",
+          "title": "Tập 11: Thuốc Không Đổi Người - Phần 10: Thuốc Không Mua Được Người",
           "free": false,
           "price": 8,
           "body": [
@@ -38742,7 +38742,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c115",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 1: Ba Ngày Trước Cửa Vàng",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 1: Ba Ngày Trước Cửa Vàng",
           "free": false,
           "price": 8,
           "body": [
@@ -38965,7 +38965,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c116",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 2: Chợ Cháo Đêm",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 2: Chợ Cháo Đêm",
           "free": false,
           "price": 8,
           "body": [
@@ -39283,7 +39283,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c117",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 3: Lan Sẹo Không Bán Nụ Cười",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 3: Lan Sẹo Không Bán Nụ Cười",
           "free": false,
           "price": 8,
           "body": [
@@ -39530,7 +39530,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c118",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 4: Phát Súng Trong Hẻm Bạt",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 4: Phát Súng Trong Hẻm Bạt",
           "free": false,
           "price": 8,
           "body": [
@@ -39865,7 +39865,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c119",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 5: Nồi Cháo Thanh Trừng",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 5: Nồi Cháo Thanh Trừng",
           "free": false,
           "price": 8,
           "body": [
@@ -40126,7 +40126,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c120",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 6: Trẻ Con Bóc Lõi",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 6: Trẻ Con Bóc Lõi",
           "free": false,
           "price": 8,
           "body": [
@@ -40480,7 +40480,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c121",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 7: Người Săn Nghe Chuông",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 7: Người Săn Nghe Chuông",
           "free": false,
           "price": 8,
           "body": [
@@ -40769,7 +40769,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c122",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 8: Đấu Súng Dưới Đường Ray",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 8: Đấu Súng Dưới Đường Ray",
           "free": false,
           "price": 8,
           "body": [
@@ -41068,7 +41068,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c123",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 9: Sổ Người Của Mụ Hồng Muối",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 9: Sổ Người Của Mụ Hồng Muối",
           "free": false,
           "price": 8,
           "body": [
@@ -41436,7 +41436,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c124",
-          "title": "Tập 12: Cua Vang Mo Ba Ngay - Phần 10: Cửa Vàng Mở Nhưng Không Đón Ai",
+          "title": "Tập 12: Cửa Vàng Mở Ba Ngày - Phần 10: Cửa Vàng Mở Nhưng Không Đón Ai",
           "free": false,
           "price": 8,
           "body": [
@@ -41847,7 +41847,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c125",
-          "title": "Tập 13: So Chon Nguoi - Phần 1: Dòng Mực Xanh Dưới Đèn Dầu",
+          "title": "Tập 13: Sổ Chọn Người - Phần 1: Dòng Mực Xanh Dưới Đèn Dầu",
           "free": false,
           "price": 8,
           "body": [
@@ -42111,7 +42111,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c126",
-          "title": "Tập 13: So Chon Nguoi - Phần 2: Chín Đứa Trẻ Uống Nửa Bát Nước",
+          "title": "Tập 13: Sổ Chọn Người - Phần 2: Chín Đứa Trẻ Uống Nửa Bát Nước",
           "free": false,
           "price": 8,
           "body": [
@@ -42379,7 +42379,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c127",
-          "title": "Tập 13: So Chon Nguoi - Phần 3: Người Không Có Tên Trong Hàng",
+          "title": "Tập 13: Sổ Chọn Người - Phần 3: Người Không Có Tên Trong Hàng",
           "free": false,
           "price": 8,
           "body": [
@@ -42618,7 +42618,7 @@ window.STORY_DATA = {
         },
         {
           "id": "c128",
-          "title": "Tập 13: So Chon Nguoi - Phần 4: Còi Bụi Ba Tiếng Ngắn",
+          "title": "Tập 13: Sổ Chọn Người - Phần 4: Còi Bụi Ba Tiếng Ngắn",
           "free": false,
           "price": 8,
           "body": [

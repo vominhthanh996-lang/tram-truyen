@@ -16,6 +16,18 @@ AUDIO_PRESETS = [
 ]
 TITLE_OVERRIDES = {
     "khu-17-ngoai-thanh": "Khu 17 Ngoại Thành",
+    "duong-ray-phia-nam": "Đường Ray Phía Nam",
+    "ben-trong-buc-tuong": "Bên Trong Bức Tường",
+    "phe-do-cam-khu": "Phế Đô Cấm Khu",
+    "thanh-moi-tren-phe-tho": "Thành Mới Trên Phế Thổ",
+    "giu-cong-tram-so-chin": "Giữ Cổng Trạm Số Chín",
+    "bay-ngay-co-lap": "Bảy Ngày Cô Lập",
+    "nguoi-chet-ky-ten": "Người Chết Ký Tên",
+    "nuoc-xam-khong-mang-co": "Nước Xám Không Mang Cờ",
+    "danh-sach-nguoi-con-ten": "Danh Sách Người Còn Tên",
+    "thuoc-khong-doi-nguoi": "Thuốc Không Đổi Người",
+    "cua-vang-mo-ba-ngay": "Cửa Vàng Mở Ba Ngày",
+    "so-chon-nguoi": "Sổ Chọn Người",
 }
 
 
