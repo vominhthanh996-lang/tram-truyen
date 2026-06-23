@@ -1,0 +1,49 @@
+{
+  "files": [
+    {
+      "chapterId": "c001",
+      "preset": "nam-cang-thang",
+      "file": "c001-nam-cang-thang.mp3",
+      "size": 6571557,
+      "duration": 793.112208,
+      "verified": true,
+      "verifiedAt": "2026-06-23T04:32:02.349671+00:00"
+    },
+    {
+      "chapterId": "c001",
+      "preset": "nam-tram",
+      "file": "c001-nam-tram.mp3",
+      "size": 6522333,
+      "duration": 785.921625,
+      "verified": true,
+      "verifiedAt": "2026-06-23T04:32:02.247629+00:00"
+    },
+    {
+      "chapterId": "c001",
+      "preset": "nu-cam-xuc",
+      "file": "c001.mp3",
+      "size": 6800133,
+      "duration": 821.329958,
+      "verified": true,
+      "verifiedAt": "2026-06-23T04:32:02.207319+00:00"
+    },
+    {
+      "chapterId": "c001",
+      "preset": "nu-cham-am",
+      "file": "c001-nu-cham-am.mp3",
+      "size": 6726405,
+      "duration": 808.378958,
+      "verified": true,
+      "verifiedAt": "2026-06-23T04:32:02.294159+00:00"
+    },
+    {
+      "chapterId": "c001",
+      "preset": "nu-nhe-nhang",
+      "file": "c001-nu-nhe-nhang.mp3",
+      "size": 6737709,
+      "duration": 813.918667,
+      "verified": true,
+      "verifiedAt": "2026-06-23T04:32:02.410746+00:00"
+    }
+  ]
+}

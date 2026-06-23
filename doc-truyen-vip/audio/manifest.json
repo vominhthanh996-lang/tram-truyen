@@ -1,34 +1,10 @@
 [
   {
     "storyId": "phe-tho-ta-nhat-duoc-ca-the-gioi",
-    "chapterId": "c005",
-    "title": "Tập 01: Khu 17 Ngoại Thành - Phần 5: Viên Tinh Thạch Trong Bùn Đen",
-    "voices": [
-      {
-        "preset": "nu-cam-xuc",
-        "label": "Nữ cảm xúc",
-        "audioUrl": "audio/c005.mp3"
-      },
-      {
-        "preset": "nam-tram",
-        "label": "Nam trầm",
-        "audioUrl": "audio/c005-nam-tram.mp3"
-      },
-      {
-        "preset": "nu-cham-am",
-        "label": "Nữ chậm ấm",
-        "audioUrl": "audio/c005-nu-cham-am.mp3"
-      },
-      {
-        "preset": "nam-cang-thang",
-        "label": "Nam căng thẳng",
-        "audioUrl": "audio/c005-nam-cang-thang.mp3"
-      },
-      {
-        "preset": "nu-nhe-nhang",
-        "label": "Nữ nhẹ",
-        "audioUrl": "audio/c005-nu-nhe-nhang.mp3"
-      }
-    ]
+    "chapterId": "c001",
+    "title": "Tập 01: Khu 17 Ngoại Thành - Phần 1: Hộp Thịt Trong Túi Người Chết",
+    "preset": "nu-nhe-nhang",
+    "label": "Nữ nhẹ",
+    "audioUrl": "audio/c001-nu-nhe-nhang.mp3"
   }
 ]
