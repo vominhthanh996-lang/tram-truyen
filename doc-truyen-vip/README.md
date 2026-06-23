@@ -63,6 +63,28 @@ python tools/build_doc_truyen_data.py
 
 File MP3 sẽ nằm trong `doc-truyen-vip/audio/`. Khi file `audio/c001.mp3` tồn tại, `build_doc_truyen_data.py` sẽ tự gắn `audioUrl` vào chương `c001`, và trang đọc sẽ hiện player MP3.
 
+## Gen Audio Và Upload Một Lệnh
+
+Luồng an toàn mới là: gen MP3 dưới máy, verify file, rebuild `data.js`, rồi mới upload. Web chỉ dùng MP3 đã có trong `doc-truyen-vip/audio/verified-audio.json`, nên file cũ hoặc file lỗi sẽ không tự bật.
+
+Gen 1 chương, 1 giọng, chưa upload:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset nu-cam-xuc -Engine video
+```
+
+Gen 1 chương đủ 5 giọng và upload lên GitHub Pages:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset all -Engine video -Upload -Message "Upload c001 audio"
+```
+
+Gen thử 3 chương đầu, 1 giọng:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -All -Limit 3 -Preset nu-cam-xuc -Engine video -Upload
+```
+
 ## Nâng Cấp Lên Bản Thật
 
 1. Chuyển data từ `data.js` sang database Supabase/Postgres.

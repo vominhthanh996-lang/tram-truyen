@@ -2043,15 +2043,7 @@ window.STORY_DATA = {
             "Trong ánh sáng yếu của đèn mỡ, dấu Hắc Nha trên đó giống một con mắt đen nhỏ.",
             "Nó chưa nhìn thấy họ.",
             "Nhưng sớm muộn gì cũng sẽ."
-          ],
-          "audioUrls": {
-            "nu-cam-xuc": "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio/c005.mp3",
-            "nam-tram": "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio/c005-nam-tram.mp3",
-            "nu-cham-am": "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio/c005-nu-cham-am.mp3",
-            "nam-cang-thang": "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio/c005-nam-cang-thang.mp3",
-            "nu-nhe-nhang": "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio/c005-nu-nhe-nhang.mp3"
-          },
-          "audioUrl": "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio/c005.mp3"
+          ]
         },
         {
           "id": "c006",

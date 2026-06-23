@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path("phe-tho-ta-nhat-duoc-ca-the-gioi")
 OUT = Path("doc-truyen-vip/data.js")
 AUDIO_DIR = Path("doc-truyen-vip/audio")
+AUDIO_VERIFIED = AUDIO_DIR / "verified-audio.json"
 AUDIO_PUBLIC_BASE = "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio"
 AUDIO_PRESETS = [
     ("nu-cam-xuc", ""),
@@ -63,9 +64,21 @@ def markdown_blocks(text: str):
     return blocks
 
 
+def verified_audio_files():
+    if not AUDIO_VERIFIED.exists():
+        return set()
+    data = json.loads(AUDIO_VERIFIED.read_text(encoding="utf-8"))
+    return {
+        str(item.get("file", "")).replace("\\", "/")
+        for item in data.get("files", [])
+        if item.get("verified")
+    }
+
+
 def build():
     files = sorted(ROOT.glob("tap-*/ban-v3-dai-than/phan-*.md"), key=natural_key)
     chapters = []
+    verified_files = verified_audio_files()
 
     for idx, path in enumerate(files, start=1):
         text = path.read_text(encoding="utf-8")
@@ -86,7 +99,8 @@ def build():
         audio_urls = {}
         for preset_id, suffix in AUDIO_PRESETS:
             audio_path = AUDIO_DIR / f"{chapter_id}{suffix}.mp3"
-            if audio_path.exists():
+            audio_file = audio_path.name
+            if audio_path.exists() and audio_file in verified_files:
                 audio_urls[preset_id] = f"{AUDIO_PUBLIC_BASE}/{chapter_id}{suffix}.mp3"
         if audio_urls:
             chapter["audioUrls"] = audio_urls

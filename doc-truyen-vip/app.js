@@ -51,7 +51,7 @@ const audioVoicePresets = [
   }
 ];
 const audioSpeedOptions = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
-const preferGeneratedMp3 = false;
+const preferGeneratedMp3 = true;
 let state = loadState();
 let activeRouteHash = "";
 let speechState = {
