@@ -8,6 +8,7 @@ OUT = Path("doc-truyen-vip/data.js")
 AUDIO_DIR = Path("doc-truyen-vip/audio")
 AUDIO_VERIFIED = AUDIO_DIR / "verified-audio.json"
 AUDIO_PUBLIC_BASE = "https://raw.githubusercontent.com/vominhthanh996-lang/truyen-2k/main/doc-truyen-vip/audio"
+REQUIRED_AUDIO_PROVIDER = "fpt"
 AUDIO_PRESETS = [
     ("nu-cam-xuc", ""),
     ("nam-tram", "-nam-tram"),
@@ -71,7 +72,7 @@ def verified_audio_files():
     return {
         str(item.get("file", "")).replace("\\", "/")
         for item in data.get("files", [])
-        if item.get("verified")
+        if item.get("verified") and item.get("provider") == REQUIRED_AUDIO_PROVIDER
     }
 
 

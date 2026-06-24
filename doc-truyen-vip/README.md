@@ -19,15 +19,13 @@ Các bước khi đã có domain:
 ## Tính năng có sẵn
 
 - Trang chủ, thư viện, trang chi tiết truyện, reader mode.
-- Chương miễn phí và chương khóa.
-- VIP 30 ngày hoặc mở chương bằng xu.
+- Tất cả chương đang mở miễn phí.
 - Reader tiếng Việt rõ dấu trên desktop/mobile, có nền sáng/nền tối.
-- Mỗi chương có khu vực nghe audio: ưu tiên file MP3 nếu đã upload, nếu chưa có thì dùng giọng đọc của trình duyệt.
-- Checkout payOS/VietQR ở chế độ thử nghiệm: bấm "Xác nhận thanh toán thử" để kích hoạt gói trên máy hiện tại.
+- Mỗi chương có khu vực nghe audio: chỉ phát khi có MP3 FPT đã verify, để tránh giả 5 giọng bằng Web Speech/Edge.
 - Bình luận ở trang truyện và từng chương.
 - Nếu đã cấu hình Supabase, bình luận sẽ đồng bộ chung cho mọi độc giả.
-- Lưu ví xu, VIP, chương đã mở và lịch sử giao dịch bằng `localStorage`.
-- Trang quản trị nội bộ để xem tổng truyện, chương khóa, giao dịch.
+- Lưu chương đang đọc và tuỳ chọn reader/audio bằng `localStorage`.
+- Trang quản trị nội bộ để xem tổng truyện và chương miễn phí.
 
 ## Bật Bình Luận Chung Bằng Supabase
 
@@ -45,23 +43,32 @@ window.SUPABASE_CONFIG = {
 
 Khi hai giá trị này có thật, web sẽ dùng Supabase REST API để đọc/ghi bình luận chung.
 
-## Tạo Audio Cho Chương
+## Tạo Audio FPT Cho Chương
 
-Nghe nhanh trên web dùng Web Speech API của trình duyệt. Muốn upload file MP3 thật cho từng chương thì chạy:
+Hiện Edge/Web Speech chỉ có 2 giọng Việt thật, nên không dùng để giả 5 giọng. Muốn tạo 5 giọng khác nhau cần FPT.AI và biến môi trường `FPT_API_KEY` hoặc `FPT_AI_API_KEY`.
+
+Năm preset đang map vào 5 voice FPT khác nhau:
+
+- `nu-cam-xuc`: Ban Mai - nữ miền Bắc.
+- `nam-tram`: Lê Minh - nam miền Bắc.
+- `nu-cham-am`: Mỹ An - nữ miền Trung.
+- `nam-cang-thang`: Gia Huy - nam miền Trung.
+- `nu-nhe-nhang`: Lan Nhi - nữ miền Nam.
+
+Gen 1 chương 1 giọng:
 
 ```powershell
-python tools/generate_chapter_audio.py --chapter c001
+python tools/generate_chapter_audio.py --chapter c001 --preset nu-cam-xuc --engine fpt --overwrite
 python tools/build_doc_truyen_data.py
 ```
 
-Tạo toàn bộ chương:
+Tạo toàn bộ chương đủ 5 giọng sẽ rất lâu và tạo nhiều file MP3. Nên test 1 chương trước:
 
 ```powershell
-python tools/generate_chapter_audio.py --all
-python tools/build_doc_truyen_data.py
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset all -Engine fpt -Overwrite -Upload -Message "Upload c001 FPT audio"
 ```
 
-File MP3 sẽ nằm trong `doc-truyen-vip/audio/`. Khi file `audio/c001.mp3` tồn tại, `build_doc_truyen_data.py` sẽ tự gắn `audioUrl` vào chương `c001`, và trang đọc sẽ hiện player MP3.
+File MP3 chỉ được web gắn vào `data.js` sau khi verify và có `provider: "fpt"` trong `doc-truyen-vip/audio/verified-audio.json`.
 
 ## Gen Audio Và Upload Một Lệnh
 
@@ -70,19 +77,19 @@ Luồng an toàn mới là: gen MP3 dưới máy, verify file, rebuild `data.js`
 Gen 1 chương, 1 giọng, chưa upload:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset nu-cam-xuc -Engine video
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset nu-cam-xuc -Engine fpt -Overwrite
 ```
 
 Gen 1 chương đủ 5 giọng và upload lên GitHub Pages:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset all -Engine video -Upload -Message "Upload c001 audio"
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -Chapter c001 -Preset all -Engine fpt -Overwrite -Upload -Message "Upload c001 FPT audio"
 ```
 
 Gen thử 3 chương đầu, 1 giọng:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -All -Limit 3 -Preset nu-cam-xuc -Engine video -Upload
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/gen_audio_upload.ps1 -All -Limit 3 -Preset nu-cam-xuc -Engine fpt -Overwrite -Upload
 ```
 
 ## Nâng Cấp Lên Bản Thật

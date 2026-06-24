@@ -73,6 +73,7 @@ def verify_file(chapter_id, preset, min_size, min_duration):
         "file": path.name,
         "size": size,
         "duration": duration,
+        "provider": "fpt",
         "verified": True,
         "verifiedAt": datetime.now(timezone.utc).isoformat(),
     }

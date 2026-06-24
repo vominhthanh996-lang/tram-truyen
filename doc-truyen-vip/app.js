@@ -16,35 +16,35 @@ const storageKey = "doctruyen_vip_state_v1";
 const audioVoicePresets = [
   {
     id: "nu-cam-xuc",
-    label: "Nữ cảm xúc",
+    label: "Ban Mai - nữ Bắc",
     voiceMatch: /hoai|my|female|woman|natural/i,
     fallbackRate: 1,
     fallbackPitch: 1.08
   },
   {
     id: "nam-tram",
-    label: "Nam trầm",
+    label: "Lê Minh - nam Bắc",
     voiceMatch: /nam|minh|male|man|natural/i,
     fallbackRate: 0.92,
     fallbackPitch: 0.78
   },
   {
     id: "nu-cham-am",
-    label: "Nữ chậm ấm",
+    label: "Mỹ An - nữ Trung",
     voiceMatch: /hoai|my|female|woman|natural/i,
     fallbackRate: 0.86,
     fallbackPitch: 0.96
   },
   {
     id: "nam-cang-thang",
-    label: "Nam căng thẳng",
+    label: "Gia Huy - nam Trung",
     voiceMatch: /nam|minh|male|man|natural/i,
     fallbackRate: 1.08,
     fallbackPitch: 0.92
   },
   {
     id: "nu-nhe-nhang",
-    label: "Nữ nhẹ",
+    label: "Lan Nhi - nữ Nam",
     voiceMatch: /hoai|my|female|woman|natural/i,
     fallbackRate: 0.96,
     fallbackPitch: 1.18
@@ -365,7 +365,7 @@ function playAudioForChapter(storyId, chapter) {
     audio.playbackRate = selectedAudioSpeed();
     audio.play()
       .then(() => {
-        updateAudioStatus(`Đang phát MP3 gen sẵn ở tốc độ ${selectedAudioSpeed()}x.`);
+        updateAudioStatus(`Đang phát MP3 FPT ở tốc độ ${selectedAudioSpeed()}x.`);
         startAudioProgressLoop(audio);
       })
       .catch(() => {
@@ -796,13 +796,20 @@ function renderAudioPanel(story, chapter, readable, prev, next) {
   const voiceId = selectedAudioVoice();
   const speed = selectedAudioSpeed();
   const audioUrl = chapterAudioUrl(chapter, voiceId);
-  const voiceLabel = audioVoicePresets.find((voice) => voice.id === voiceId)?.label || "Nữ cảm xúc";
+  const voiceLabel = audioVoicePresets.find((voice) => voice.id === voiceId)?.label || "Ban Mai - nữ Bắc";
   const nativePlayer = audioUrl
     ? `<audio controls preload="metadata" src="${escapeHtml(audioUrl)}" data-generated-audio></audio>`
     : "";
   const modeText = audioUrl
-    ? `Đang có MP3 gen sẵn cho giọng ${voiceLabel}. Player bên dưới kéo tua qua lại được.`
-    : `Giọng ${voiceLabel} sẽ đọc trực tiếp từ nội dung chương đang mở, nên không bị lệch sang chương khác.`;
+    ? `Đang có MP3 FPT gen sẵn cho giọng ${voiceLabel}. Player bên dưới kéo tua qua lại được.`
+    : `Chưa có MP3 FPT cho giọng ${voiceLabel}. Cần gen audio thật trước khi bật nghe để tránh dùng lại giọng trình duyệt bị trùng.`;
+  const audioActions = audioUrl
+    ? `
+        <button class="btn btn-primary" data-speak-chapter="${story.id}:${chapter.id}">Nghe chương</button>
+        <button class="btn btn-secondary" data-pause-speech>Tạm dừng / tiếp tục</button>
+        <button class="btn btn-secondary" data-stop-speech>Dừng</button>
+      `
+    : `<button class="btn btn-secondary" disabled>Chưa có MP3 thật</button>`;
 
   return `
     <section class="audio-panel" data-audio-panel="${story.id}:${chapter.id}">
@@ -838,12 +845,10 @@ function renderAudioPanel(story, chapter, readable, prev, next) {
         <input type="range" min="0" max="100" value="0" step="0.1" data-audio-seek />
       </label>
       <div class="audio-actions">
-        <button class="btn btn-primary" data-speak-chapter="${story.id}:${chapter.id}">Nghe chương</button>
-        <button class="btn btn-secondary" data-pause-speech>Tạm dừng / tiếp tục</button>
-        <button class="btn btn-secondary" data-stop-speech>Dừng</button>
+        ${audioActions}
       </div>
       ${renderChapterNav(story, prev, next, "audio-chapter-nav")}
-      <p class="audio-status"><span data-audio-status>${audioUrl ? "Sẵn sàng phát MP3 gen sẵn." : `Sẵn sàng đọc trực tiếp bằng giọng ${voiceLabel}.`}</span> <strong data-audio-progress-text>0%</strong></p>
+      <p class="audio-status"><span data-audio-status>${audioUrl ? "Sẵn sàng phát MP3 FPT." : "Chưa có file MP3 thật cho giọng này."}</span> <strong data-audio-progress-text>0%</strong></p>
     </section>
   `;
 }
@@ -1265,7 +1270,7 @@ document.addEventListener("play", (event) => {
   if (!audio) return;
   stopSpeech();
   audio.playbackRate = selectedAudioSpeed();
-  updateAudioStatus(`Đang phát MP3 gen sẵn ở tốc độ ${selectedAudioSpeed()}x.`);
+  updateAudioStatus(`Đang phát MP3 FPT ở tốc độ ${selectedAudioSpeed()}x.`);
   startAudioProgressLoop(audio);
 }, true);
 

@@ -3,8 +3,8 @@ param(
   [switch]$All,
   [int]$Limit = 0,
   [string[]]$Preset = @("nu-cam-xuc"),
-  [ValidateSet("video", "direct")]
-  [string]$Engine = "video",
+  [ValidateSet("fpt", "video", "direct")]
+  [string]$Engine = "fpt",
   [switch]$Overwrite,
   [switch]$Upload,
   [string]$Message = ""
