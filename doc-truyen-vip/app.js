@@ -62,7 +62,8 @@ let accountSummary = {
   wallet: { balance_vnd: 0, coin_balance: 0 },
   progress: [],
   unlocked: [],
-  vip: []
+  vip: [],
+  transactions: []
 };
 
 function defaultLastRead() {
@@ -157,7 +158,8 @@ function resetAccountSummary() {
     wallet: { balance_vnd: 0, coin_balance: 0 },
     progress: [],
     unlocked: [],
-    vip: []
+    vip: [],
+    transactions: []
   };
 }
 
@@ -165,17 +167,19 @@ async function loadAccountSummary() {
   resetAccountSummary();
   if (!supabaseClient || !authUser) return;
 
-  const [walletRes, progressRes, unlockedRes, vipRes] = await Promise.all([
+  const [walletRes, progressRes, unlockedRes, vipRes, txRes] = await Promise.all([
     supabaseClient.from("account_wallets").select("balance_vnd,coin_balance").eq("user_id", authUser.id).maybeSingle(),
     supabaseClient.from("reading_progress").select("story_id,chapter_id,updated_at").eq("user_id", authUser.id).order("updated_at", { ascending: false }),
     supabaseClient.from("unlocked_chapters").select("story_id,chapter_id,source,created_at").eq("user_id", authUser.id).order("created_at", { ascending: false }),
-    supabaseClient.from("vip_entitlements").select("plan_id,active_until,source,created_at").eq("user_id", authUser.id).order("active_until", { ascending: false })
+    supabaseClient.from("vip_entitlements").select("plan_id,active_until,source,created_at").eq("user_id", authUser.id).order("active_until", { ascending: false }),
+    supabaseClient.from("coin_transactions").select("amount,reason,story_id,chapter_id,created_at").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20)
   ]);
 
   if (!walletRes.error && walletRes.data) accountSummary.wallet = walletRes.data;
   if (!progressRes.error && progressRes.data) accountSummary.progress = progressRes.data;
   if (!unlockedRes.error && unlockedRes.data) accountSummary.unlocked = unlockedRes.data;
   if (!vipRes.error && vipRes.data) accountSummary.vip = vipRes.data;
+  if (!txRes.error && txRes.data) accountSummary.transactions = txRes.data;
 }
 
 async function upsertProfile() {
@@ -521,7 +525,18 @@ function chapterKey(storyId, chapterId) {
 }
 
 function canRead(storyId, chapter) {
-  return true;
+  if (!chapter) return false;
+  if (chapter.free !== false) return true;
+  if (isVip()) return true;
+  return isChapterUnlocked(storyId, chapter.id);
+}
+
+function chapterPriceCoins(chapter) {
+  return Math.max(0, Number(chapter?.price || chapter?.price_coins || 0));
+}
+
+function isChapterUnlocked(storyId, chapterId) {
+  return accountSummary.unlocked.some((item) => item.story_id === storyId && item.chapter_id === chapterId);
 }
 
 function commentKey(storyId, chapterId = "story") {
@@ -724,9 +739,41 @@ function getStoryProgress(story) {
   return Math.round((readable / story.chapters.length) * 100);
 }
 
-function unlockChapter(storyId, chapter) {
+async function unlockChapter(storyId, chapter) {
   if (canRead(storyId, chapter)) return true;
-  toast("Chương này hiện được mở miễn phí.");
+  if (!supabaseClient) {
+    toast("Chưa kết nối tài khoản, tạm thời chưa mở khóa chương tính phí được.");
+    return false;
+  }
+  if (!isLoggedIn()) {
+    openAuthModal();
+    toast("Đăng nhập trước rồi mở khóa chương nha.");
+    return false;
+  }
+
+  const { data, error } = await supabaseClient.rpc("unlock_chapter_with_coins", {
+    p_story_id: storyId,
+    p_chapter_id: chapter.id
+  });
+
+  if (error) {
+    if (error.message?.includes("INSUFFICIENT_COINS")) {
+      toast("Không đủ xu để mở chương này.");
+    } else if (error.message?.includes("LOGIN_REQUIRED")) {
+      openAuthModal();
+      toast("Đăng nhập trước rồi mở khóa chương nha.");
+    } else {
+      toast("Mở khóa chưa thành công. Thử lại sau nha.");
+    }
+    return false;
+  }
+
+  const result = Array.isArray(data) ? data[0] : data;
+  await loadAccountSummary();
+  renderAccount();
+  toast(result?.charged
+    ? `Đã trừ ${Number(result.price_coins || 0).toLocaleString("vi-VN")} xu và mở chương.`
+    : "Chương này đã được mở cho tài khoản của bạn.");
   return true;
 }
 
@@ -944,15 +991,22 @@ function renderStory(storyId) {
 }
 
 function chapterRow(storyId, chapter) {
+  const readable = canRead(storyId, chapter);
+  const price = chapterPriceCoins(chapter);
+  const label = chapter.free !== false
+    ? "Miễn phí"
+    : readable
+      ? (isVip() ? "VIP" : "Đã mở")
+      : `${price.toLocaleString("vi-VN")} xu`;
   return `
     <article class="chapter-row">
       <div>
         <strong>${chapter.title}</strong>
-        <span class="muted">Miễn phí</span>
+        <span class="muted">${label}</span>
       </div>
-      <a class="btn btn-primary" href="#/read/${storyId}/${chapter.id}">
-        Đọc
-      </a>
+      ${readable
+        ? `<a class="btn btn-primary" href="#/read/${storyId}/${chapter.id}">Đọc</a>`
+        : `<button class="btn btn-primary" data-unlock-chapter="${storyId}:${chapter.id}">Mở khóa</button>`}
     </article>
   `;
 }
@@ -1072,14 +1126,15 @@ function renderReader(storyId, chapterId) {
 }
 
 function paywallBlock(storyId, chapter) {
+  const price = chapterPriceCoins(chapter);
   return `
     <section class="paywall">
-      <span class="eyebrow">Đọc miễn phí</span>
+      <span class="eyebrow">Chương tính phí</span>
       <h2>${chapter.title}</h2>
-      <p>Chương này đã được mở miễn phí. Tải lại trang nếu bạn vẫn thấy thông báo cũ.</p>
+      <p>Chương này cần ${price.toLocaleString("vi-VN")} xu để mở. Sau khi mở, hệ thống lưu vào tài khoản nên lần sau đăng nhập lại vẫn đọc được.</p>
       <div class="paywall-actions">
-        <a class="btn btn-primary" href="#/read/${storyId}/${chapter.id}">Đọc chương</a>
-        <a class="btn btn-secondary" href="#/library">Về thư viện</a>
+        <button class="btn btn-primary" data-unlock-chapter="${storyId}:${chapter.id}">Mở khóa bằng xu</button>
+        <a class="btn btn-secondary" href="#/account">Xem tài khoản</a>
       </div>
     </section>
   `;
@@ -1255,6 +1310,31 @@ function renderAccountPage() {
           }).join("")}
         </div>
       ` : `<p class="muted">Hiện toàn bộ truyện đang free nên chưa cần mở khóa chương riêng.</p>`}
+    </section>
+
+    <section class="panel account-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Ví xu</span>
+          <h2>Lịch sử giao dịch</h2>
+        </div>
+        <span class="status-chip">${accountSummary.transactions.length} giao dịch</span>
+      </div>
+      ${accountSummary.transactions.length ? `
+        <div class="account-list">
+          ${accountSummary.transactions.map((item) => {
+            const story = getStory(item.story_id);
+            const chapter = getChapter(item.story_id, item.chapter_id);
+            const amount = Number(item.amount || 0);
+            return `
+              <article class="account-list-item">
+                <strong>${amount > 0 ? "+" : ""}${amount.toLocaleString("vi-VN")} xu</strong>
+                <span>${escapeHtml(chapter?.title || item.reason)}${story ? ` · ${escapeHtml(story.title)}` : ""} · ${new Date(item.created_at).toLocaleString("vi-VN")}</span>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      ` : `<p class="muted">Chưa có giao dịch xu nào.</p>`}
     </section>
   `;
 }
@@ -1447,7 +1527,7 @@ function route() {
   if (shouldScrollTop) window.scrollTo({ top: 0, left: 0, behavior: "auto" });
 }
 
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
   if (event.target.closest("[data-open-auth]")) {
     openAuthModal();
   }
@@ -1464,9 +1544,12 @@ document.addEventListener("click", (event) => {
 
   const unlockButton = event.target.closest("[data-unlock-chapter]");
   if (unlockButton) {
+    event.preventDefault();
     const [storyId, chapterId] = unlockButton.dataset.unlockChapter.split(":");
     const chapter = getChapter(storyId, chapterId);
-    if (chapter && unlockChapter(storyId, chapter)) route();
+    unlockButton.disabled = true;
+    if (chapter && await unlockChapter(storyId, chapter)) route();
+    unlockButton.disabled = false;
   }
 
   const sizeButton = event.target.closest("[data-reader-size]");
