@@ -33,6 +33,11 @@ const audioVoicePresets = [
 ];
 const audioSpeedOptions = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
 const preferGeneratedMp3 = true;
+const fallbackCoinPackages = [
+  { id: "coins-20k", title: "Gói 20.000đ", description: "Nạp nhanh để mở vài chương đầu.", price_vnd: 20000, coins: 200, bonus_coins: 0 },
+  { id: "coins-50k", title: "Gói 50.000đ", description: "Phù hợp đọc thường xuyên.", price_vnd: 50000, coins: 500, bonus_coins: 50 },
+  { id: "coins-100k", title: "Gói 100.000đ", description: "Nhiều xu hơn để đọc dài kỳ.", price_vnd: 100000, coins: 1000, bonus_coins: 200 }
+];
 let state = loadState();
 let activeRouteHash = "";
 let speechState = {
@@ -60,6 +65,7 @@ const supabaseClient = sharedCommentsEnabled && window.supabase
   ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey)
   : null;
 const remoteComments = {};
+let coinPackages = fallbackCoinPackages;
 let authSession = null;
 let authUser = null;
 let userVipUntil = null;
@@ -68,7 +74,8 @@ let accountSummary = {
   progress: [],
   unlocked: [],
   vip: [],
-  transactions: []
+  transactions: [],
+  orders: []
 };
 
 function defaultLastRead() {
@@ -164,7 +171,8 @@ function resetAccountSummary() {
     progress: [],
     unlocked: [],
     vip: [],
-    transactions: []
+    transactions: [],
+    orders: []
   };
 }
 
@@ -172,12 +180,13 @@ async function loadAccountSummary() {
   resetAccountSummary();
   if (!supabaseClient || !authUser) return;
 
-  const [walletRes, progressRes, unlockedRes, vipRes, txRes] = await Promise.all([
+  const [walletRes, progressRes, unlockedRes, vipRes, txRes, orderRes] = await Promise.all([
     supabaseClient.from("account_wallets").select("balance_vnd,coin_balance").eq("user_id", authUser.id).maybeSingle(),
     supabaseClient.from("reading_progress").select("story_id,chapter_id,updated_at").eq("user_id", authUser.id).order("updated_at", { ascending: false }),
     supabaseClient.from("unlocked_chapters").select("story_id,chapter_id,source,created_at").eq("user_id", authUser.id).order("created_at", { ascending: false }),
     supabaseClient.from("vip_entitlements").select("plan_id,active_until,source,created_at").eq("user_id", authUser.id).order("active_until", { ascending: false }),
-    supabaseClient.from("coin_transactions").select("amount,reason,story_id,chapter_id,created_at").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20)
+    supabaseClient.from("coin_transactions").select("amount,reason,story_id,chapter_id,order_id,provider,provider_reference,created_at").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(20),
+    supabaseClient.from("payment_orders").select("id,provider,package_id,order_code,amount_vnd,coins,status,checkout_url,created_at,paid_at").eq("user_id", authUser.id).order("created_at", { ascending: false }).limit(10)
   ]);
 
   if (!walletRes.error && walletRes.data) accountSummary.wallet = walletRes.data;
@@ -185,6 +194,7 @@ async function loadAccountSummary() {
   if (!unlockedRes.error && unlockedRes.data) accountSummary.unlocked = unlockedRes.data;
   if (!vipRes.error && vipRes.data) accountSummary.vip = vipRes.data;
   if (!txRes.error && txRes.data) accountSummary.transactions = txRes.data;
+  if (!orderRes.error && orderRes.data) accountSummary.orders = orderRes.data;
 }
 
 async function upsertProfile() {
@@ -288,6 +298,19 @@ async function loadStoryCatalog() {
   stories = (payload.stories || []).map(normalizeCatalogStory);
   hydrateLastReadFromCatalog();
   storyCatalogReady = true;
+}
+
+async function loadCoinPackages() {
+  if (!supabaseClient) {
+    coinPackages = fallbackCoinPackages;
+    return;
+  }
+  const { data, error } = await supabaseClient
+    .from("coin_packages")
+    .select("id,title,description,price_vnd,coins,bonus_coins")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true });
+  if (!error && data?.length) coinPackages = data;
 }
 
 async function loadChapterForReader(storyId, chapterId) {
@@ -1236,21 +1259,30 @@ function paywallBlock(storyId, chapter) {
 }
 
 function renderWallet() {
+  const wallet = accountSummary.wallet || { balance_vnd: 0, coin_balance: 0 };
   els.view.innerHTML = `
     <div class="page-title">
       <div>
-        <span class="eyebrow">Đọc miễn phí</span>
-        <h1>Thanh toán đang tạm tắt</h1>
+        <span class="eyebrow">Ví xu</span>
+        <h1>Nạp xu bằng VietQR / payOS</h1>
+        <p class="muted">Mỗi giao dịch tạo một mã đơn riêng gắn với account đang đăng nhập.</p>
       </div>
-      <span class="status-chip vip">Tất cả chương miễn phí</span>
+      <span class="status-chip vip">${Number(wallet.coin_balance || 0).toLocaleString("vi-VN")} xu</span>
     </div>
     <section class="plans-grid">
-      <article class="payment-card">
-        <span class="eyebrow">Truyện 2K</span>
-        <h3>Không cần thanh toán</h3>
-        <p>Giai đoạn này site mở free cho độc giả đọc và nghe truyện trước.</p>
-        <a class="btn btn-primary" href="#/library">Vào thư viện</a>
-      </article>
+      ${coinPackages.map((pack) => {
+        const totalCoins = Number(pack.coins || 0) + Number(pack.bonus_coins || 0);
+        return `
+          <article class="payment-card">
+            <span class="eyebrow">Nạp xu</span>
+            <h3>${escapeHtml(pack.title)}</h3>
+            <strong>${money(pack.price_vnd)}</strong>
+            <p class="muted">${escapeHtml(pack.description || "")}</p>
+            <p><strong>${totalCoins.toLocaleString("vi-VN")} xu</strong>${pack.bonus_coins ? ` · tặng ${Number(pack.bonus_coins).toLocaleString("vi-VN")} xu` : ""}</p>
+            <button class="btn btn-primary" data-open-checkout="${pack.id}">Tạo mã thanh toán</button>
+          </article>
+        `;
+      }).join("")}
     </section>
   `;
 }
@@ -1355,6 +1387,17 @@ function renderAccountPage() {
     <section class="panel account-panel">
       <div class="section-head compact">
         <div>
+          <span class="eyebrow">Thanh toán</span>
+          <h2>Nạp xu để mở chương</h2>
+        </div>
+        <a class="btn btn-primary" href="#/wallet">Nạp xu</a>
+      </div>
+      <p class="muted">Tiền vào tài khoản ngân hàng đã liên kết payOS. Khi payOS báo giao dịch thành công, webhook sẽ cộng xu tự động cho đúng account.</p>
+    </section>
+
+    <section class="panel account-panel">
+      <div class="section-head compact">
+        <div>
           <span class="eyebrow">Đang đọc</span>
           <h2>${progressChapter.title}</h2>
         </div>
@@ -1430,6 +1473,26 @@ function renderAccountPage() {
           }).join("")}
         </div>
       ` : `<p class="muted">Chưa có giao dịch xu nào.</p>`}
+    </section>
+
+    <section class="panel account-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Đơn thanh toán</span>
+          <h2>Lịch sử đơn gần đây</h2>
+        </div>
+        <span class="status-chip">${accountSummary.orders.length} đơn</span>
+      </div>
+      ${accountSummary.orders.length ? `
+        <div class="account-list">
+          ${accountSummary.orders.map((order) => `
+            <article class="account-list-item">
+              <strong>${money(order.amount_vnd)} · ${Number(order.coins || 0).toLocaleString("vi-VN")} xu</strong>
+              <span>Mã ${order.order_code} · ${escapeHtml(order.status)} · ${new Date(order.created_at).toLocaleString("vi-VN")}</span>
+            </article>
+          `).join("")}
+        </div>
+      ` : `<p class="muted">Chưa có đơn thanh toán nào.</p>`}
     </section>
   `;
 }
@@ -1539,50 +1602,64 @@ async function signOut() {
   toast("Đã đăng xuất.");
 }
 
-function openCheckout(planId) {
-  const plan = plans.find((item) => item.id === planId);
-  if (!plan) {
-    toast("Thanh toán đang tạm tắt. Hiện tất cả chương đều đọc miễn phí.");
+async function openCheckout(packageId) {
+  const pack = coinPackages.find((item) => item.id === packageId);
+  if (!pack) {
+    toast("Không tìm thấy gói nạp xu.");
     return;
   }
-  const orderCode = `DTV${Date.now().toString().slice(-8)}`;
+  if (!supabaseClient) {
+    toast("Chưa kết nối Supabase nên chưa tạo thanh toán được.");
+    return;
+  }
+  if (!isLoggedIn()) {
+    openAuthModal();
+    toast("Đăng nhập trước rồi nạp xu nha.");
+    return;
+  }
+
   els.checkout.innerHTML = `
     <span class="eyebrow">VietQR / payOS</span>
-    <h2 id="checkoutTitle">${plan.title}</h2>
-    <p class="muted">${plan.description}</p>
-    <div class="qr-box" aria-label="Mã QR thanh toán"><span>${orderCode}</span></div>
-    <p><strong>Số tiền:</strong> ${money(plan.price)}</p>
-    <p><strong>Nội dung:</strong> ${orderCode} ${plan.id}</p>
-    <p class="muted">Cổng thanh toán đang ở chế độ thử nghiệm. Khi nối payOS thật, hệ thống sẽ tự kích hoạt gói sau khi ngân hàng xác nhận.</p>
+    <h2 id="checkoutTitle">Đang tạo mã thanh toán...</h2>
+    <p class="muted">Hệ thống đang tạo đơn riêng cho tài khoản ${escapeHtml(accountEmail())}.</p>
+  `;
+  els.modal.hidden = false;
+
+  const { data, error } = await supabaseClient.functions.invoke("create-payos-payment", {
+    body: { packageId }
+  });
+
+  if (error || data?.error) {
+    els.checkout.innerHTML = `
+      <span class="eyebrow">Thanh toán</span>
+      <h2 id="checkoutTitle">Chưa tạo được mã thanh toán</h2>
+      <p class="muted">Có thể Edge Function hoặc payOS keys chưa được deploy/cấu hình.</p>
+      <p><strong>Lỗi:</strong> ${escapeHtml(data?.error || error?.message || "Không rõ")}</p>
+      <div class="paywall-actions">
+        <button class="btn btn-secondary" type="button" id="copyOrderCode">Đóng</button>
+      </div>
+    `;
+    return;
+  }
+
+  els.checkout.innerHTML = `
+    <span class="eyebrow">VietQR / payOS</span>
+    <h2 id="checkoutTitle">${escapeHtml(pack.title)}</h2>
+    <p class="muted">Mã đơn này gắn với account ${escapeHtml(accountEmail())}. Thanh toán xong webhook sẽ tự cộng ${Number(data.coins || 0).toLocaleString("vi-VN")} xu.</p>
+    <div class="qr-box" aria-label="Mã QR thanh toán">
+      <span>${escapeHtml(String(data.orderCode))}</span>
+    </div>
+    <p><strong>Số tiền:</strong> ${money(data.amountVnd)}</p>
+    <p><strong>Nội dung:</strong> ${escapeHtml(data.description || String(data.orderCode))}</p>
+    <p class="muted">Tiền sẽ vào tài khoản ngân hàng đã liên kết trong payOS của mày. Web không tự giữ tiền.</p>
     <div class="paywall-actions">
-      <button class="btn btn-primary" data-confirm-payment="${plan.id}">Xác nhận thanh toán thử</button>
+      ${data.checkoutUrl ? `<a class="btn btn-primary" href="${escapeHtml(data.checkoutUrl)}" target="_blank" rel="noopener">Mở trang thanh toán</a>` : ""}
       <button class="btn btn-secondary" id="copyOrderCode">Copy mã đơn</button>
     </div>
   `;
-  els.modal.hidden = false;
-}
 
-function confirmPayment(planId) {
-  const plan = plans.find((item) => item.id === planId);
-  if (!plan) return;
-  if (plan.type === "vip") {
-    const base = isVip() ? new Date(state.user.vipUntil) : new Date();
-    base.setDate(base.getDate() + plan.days);
-    state.user.vipUntil = base.toISOString();
-  } else {
-    state.user.coins += plan.coins;
-  }
-  state.transactions.unshift({
-    id: crypto.randomUUID(),
-    type: "Thanh toán",
-    title: plan.title,
-    amount: plan.price,
-    createdAt: new Date().toISOString()
-  });
-  saveState();
-  els.modal.hidden = true;
-  toast(`Đã kích hoạt ${plan.title}.`);
-  route();
+  await loadAccountSummary();
+  renderAccount();
 }
 
 function emptyState(text) {
@@ -1629,7 +1706,7 @@ async function route() {
   else if (routeName === "story") renderStory(id);
   else if (routeName === "read") await renderReader(id, chapterId);
   else if (routeName === "account") renderAccountPage();
-  else if (routeName === "wallet") renderLibrary();
+  else if (routeName === "wallet") renderWallet();
   else if (routeName === "admin") renderAdmin();
   else renderNotFound();
   hydrateVisibleComments();
@@ -1647,10 +1724,7 @@ document.addEventListener("click", async (event) => {
   }
 
   const checkoutButton = event.target.closest("[data-open-checkout]");
-  if (checkoutButton) openCheckout(checkoutButton.dataset.openCheckout);
-
-  const confirmButton = event.target.closest("[data-confirm-payment]");
-  if (confirmButton) confirmPayment(confirmButton.dataset.confirmPayment);
+  if (checkoutButton) await openCheckout(checkoutButton.dataset.openCheckout);
 
   const unlockButton = event.target.closest("[data-unlock-chapter]");
   if (unlockButton) {
@@ -1926,5 +2000,5 @@ getSpeech()?.addEventListener?.("voiceschanged", () => {
 
 renderAccount();
 route();
-Promise.all([loadStoryCatalog(), initAuth()])
+Promise.all([loadStoryCatalog(), loadCoinPackages(), initAuth()])
   .finally(() => route());

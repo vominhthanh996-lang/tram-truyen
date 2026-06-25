@@ -110,6 +110,45 @@ create table if not exists public.account_wallets (
   )
 );
 
+create table if not exists public.coin_packages (
+  id text primary key,
+  title text not null,
+  description text,
+  price_vnd integer not null,
+  coins integer not null,
+  bonus_coins integer not null default 0,
+  is_active boolean not null default true,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint coin_packages_positive check (
+    price_vnd > 0 and coins > 0 and bonus_coins >= 0
+  )
+);
+
+create table if not exists public.payment_orders (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  provider text not null default 'payos',
+  package_id text references public.coin_packages(id),
+  order_code bigint not null unique,
+  amount_vnd integer not null,
+  coins integer not null,
+  status text not null default 'pending',
+  checkout_url text,
+  qr_code text,
+  payment_link_id text,
+  provider_reference text,
+  raw_provider_data jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now(),
+  paid_at timestamptz,
+  updated_at timestamptz not null default now(),
+  constraint payment_orders_amount_positive check (amount_vnd > 0 and coins > 0),
+  constraint payment_orders_status_valid check (
+    status in ('pending', 'paid', 'cancelled', 'expired', 'failed')
+  )
+);
+
 create table if not exists public.reading_progress (
   user_id uuid not null references auth.users(id) on delete cascade,
   story_id text not null,
@@ -143,10 +182,22 @@ create table if not exists public.coin_transactions (
   user_id uuid not null references auth.users(id) on delete cascade,
   amount integer not null,
   reason text not null,
+  order_id uuid references public.payment_orders(id) on delete set null,
+  provider text,
+  provider_reference text,
   story_id text,
   chapter_id text,
   created_at timestamptz not null default now()
 );
+
+alter table public.coin_transactions
+  add column if not exists order_id uuid references public.payment_orders(id) on delete set null;
+
+alter table public.coin_transactions
+  add column if not exists provider text;
+
+alter table public.coin_transactions
+  add column if not exists provider_reference text;
 
 create index if not exists vip_entitlements_user_active_idx
   on public.vip_entitlements (user_id, active_until desc);
@@ -156,6 +207,15 @@ create index if not exists stories_active_sort_idx
 
 create index if not exists story_chapters_story_sort_idx
   on public.story_chapters (story_id, is_active, sort_order);
+
+create index if not exists coin_packages_active_sort_idx
+  on public.coin_packages (is_active, sort_order);
+
+create index if not exists payment_orders_user_created_idx
+  on public.payment_orders (user_id, created_at desc);
+
+create index if not exists payment_orders_status_idx
+  on public.payment_orders (status, created_at desc);
 
 create index if not exists reading_progress_user_updated_idx
   on public.reading_progress (user_id, updated_at desc);
@@ -173,6 +233,8 @@ alter table public.stories enable row level security;
 alter table public.story_chapters enable row level security;
 alter table public.story_chapter_bodies enable row level security;
 alter table public.account_wallets enable row level security;
+alter table public.coin_packages enable row level security;
+alter table public.payment_orders enable row level security;
 alter table public.reading_progress enable row level security;
 alter table public.unlocked_chapters enable row level security;
 alter table public.paid_chapters enable row level security;
@@ -243,6 +305,20 @@ create policy "Public can read active story chapter metadata"
 drop policy if exists "Users can read own wallet" on public.account_wallets;
 create policy "Users can read own wallet"
   on public.account_wallets
+  for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "Public can read active coin packages" on public.coin_packages;
+create policy "Public can read active coin packages"
+  on public.coin_packages
+  for select
+  to anon, authenticated
+  using (is_active = true);
+
+drop policy if exists "Users can read own payment orders" on public.payment_orders;
+create policy "Users can read own payment orders"
+  on public.payment_orders
   for select
   to authenticated
   using (auth.uid() = user_id);
@@ -505,3 +581,120 @@ end;
 $$;
 
 grant execute on function public.get_chapter_for_reader(text, text) to anon, authenticated;
+
+insert into public.coin_packages (id, title, description, price_vnd, coins, bonus_coins, sort_order, is_active)
+values
+  ('coins-20k', 'Gói 20.000đ', 'Nạp nhanh để mở vài chương đầu.', 20000, 200, 0, 1, true),
+  ('coins-50k', 'Gói 50.000đ', 'Phù hợp đọc thường xuyên.', 50000, 550, 50, 2, true),
+  ('coins-100k', 'Gói 100.000đ', 'Nhiều xu hơn để đọc dài kỳ.', 100000, 1200, 200, 3, true)
+on conflict (id) do update set
+  title = excluded.title,
+  description = excluded.description,
+  price_vnd = excluded.price_vnd,
+  coins = excluded.coins,
+  bonus_coins = excluded.bonus_coins,
+  sort_order = excluded.sort_order,
+  is_active = excluded.is_active,
+  updated_at = now();
+
+create or replace function public.credit_payment_order(
+  p_order_code bigint,
+  p_provider text,
+  p_provider_reference text,
+  p_amount_vnd integer,
+  p_raw jsonb default '{}'::jsonb
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order public.payment_orders%rowtype;
+  v_new_balance integer := 0;
+begin
+  select *
+    into v_order
+    from public.payment_orders
+    where order_code = p_order_code
+      and provider = p_provider
+    for update;
+
+  if not found then
+    raise exception 'ORDER_NOT_FOUND' using errcode = 'P0002';
+  end if;
+
+  if v_order.status = 'paid' then
+    select coin_balance
+      into v_new_balance
+      from public.account_wallets
+      where user_id = v_order.user_id;
+
+    return jsonb_build_object(
+      'credited', false,
+      'reason', 'already_paid',
+      'order_id', v_order.id,
+      'user_id', v_order.user_id,
+      'coin_balance', coalesce(v_new_balance, 0)
+    );
+  end if;
+
+  if v_order.status <> 'pending' then
+    raise exception 'ORDER_NOT_PENDING' using errcode = 'P0001';
+  end if;
+
+  if p_amount_vnd < v_order.amount_vnd then
+    raise exception 'AMOUNT_TOO_LOW' using errcode = 'P0001';
+  end if;
+
+  insert into public.account_wallets (user_id, balance_vnd, coin_balance, updated_at)
+  values (v_order.user_id, 0, 0, now())
+  on conflict (user_id) do nothing;
+
+  update public.payment_orders
+    set status = 'paid',
+        paid_at = now(),
+        updated_at = now(),
+        provider_reference = coalesce(p_provider_reference, provider_reference),
+        raw_provider_data = coalesce(p_raw, '{}'::jsonb)
+    where id = v_order.id;
+
+  update public.account_wallets
+    set balance_vnd = balance_vnd + v_order.amount_vnd,
+        coin_balance = coin_balance + v_order.coins,
+        updated_at = now()
+    where user_id = v_order.user_id
+    returning coin_balance into v_new_balance;
+
+  insert into public.coin_transactions (
+    user_id,
+    amount,
+    reason,
+    order_id,
+    provider,
+    provider_reference
+  )
+  values (
+    v_order.user_id,
+    v_order.coins,
+    'topup',
+    v_order.id,
+    p_provider,
+    p_provider_reference
+  );
+
+  return jsonb_build_object(
+    'credited', true,
+    'order_id', v_order.id,
+    'user_id', v_order.user_id,
+    'coins', v_order.coins,
+    'coin_balance', v_new_balance
+  );
+end;
+$$;
+
+grant execute on function public.credit_payment_order(bigint, text, text, integer, jsonb) to service_role;
+revoke all on function public.credit_payment_order(bigint, text, text, integer, jsonb) from public;
+revoke all on function public.credit_payment_order(bigint, text, text, integer, jsonb) from anon;
+revoke all on function public.credit_payment_order(bigint, text, text, integer, jsonb) from authenticated;
+grant execute on function public.credit_payment_order(bigint, text, text, integer, jsonb) to service_role;

@@ -24,6 +24,8 @@ File `supabase-comments-schema.sql` tao cac bang:
 - `story_chapters`: metadata chuong, trang thai free/tinh phi, gia xu, audio URL.
 - `story_chapter_bodies`: noi dung chuong. Bang nay khong co policy public select, browser khong doc truc tiep duoc.
 - `account_wallets`: so du VND/xu cua user, frontend chi doc.
+- `coin_packages`: cac goi nap xu dang ban.
+- `payment_orders`: moi lan user bam nap xu se tao mot don rieng co `order_code` duy nhat gan voi `user_id`.
 - `reading_progress`: user dang doc toi truyen/chuong nao.
 - `unlocked_chapters`: nhung chuong user da mo khoa rieng.
 - `coin_transactions`: lich su nap/tru xu cua tung user.
@@ -75,10 +77,35 @@ Nguoi dung chi doc duoc entitlement cua chinh ho qua RLS.
 
 ## Payment sau nay
 
-Khi noi payment that, webhook can lam 3 viec:
+Payment dung payOS/VietQR:
 
-1. Xac minh giao dich thanh cong.
-2. Tim `user_id` cua account mua goi.
-3. Insert/update `vip_entitlements`, `account_wallets`, `coin_transactions`, hoac `unlocked_chapters`.
+1. User dang nhap va bam nap xu.
+2. Edge Function `create-payos-payment` tao `payment_orders` voi `order_code` duy nhat, gan voi `user_id` hien tai.
+3. Function tao payment link/QR qua payOS.
+4. Tien di vao tai khoan ngan hang da lien ket trong dashboard payOS cua mày.
+5. payOS goi Edge Function `payos-webhook` khi ngan hang bao thanh cong.
+6. Webhook verify chu ky HMAC bang `PAYOS_CHECKSUM_KEY`.
+7. Webhook goi RPC `credit_payment_order`.
+8. RPC khoa order, check status pending, check so tien, cap nhat `payment_orders.status = paid`, cong `account_wallets.coin_balance`, va ghi `coin_transactions`.
+
+Neu payOS gui webhook lap lai, RPC thay order da `paid` va khong cong xu lan nua.
+Neu nhieu account cung mua cung luc, he thong phan biet bang `order_code` duy nhat trong `payment_orders`; moi `order_code` co san `user_id`, `package_id`, `amount_vnd`, `coins`.
+
+Can set Supabase Edge Function secrets:
+
+```bash
+PAYOS_CLIENT_ID=...
+PAYOS_API_KEY=...
+PAYOS_CHECKSUM_KEY=...
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+SITE_URL=https://vominhthanh996-lang.github.io/truyen-2k/
+```
+
+Sau khi deploy function, vao payOS dashboard cau hinh webhook URL:
+
+```text
+https://lgjkyclvpzijvjepmncq.functions.supabase.co/payos-webhook
+```
 
 Khong de frontend tu cap nhat VIP/vi tien, vi user co the sua code tren trinh duyet.

@@ -1,0 +1,7 @@
+project_id = "lgjkyclvpzijvjepmncq"
+
+[functions.create-payos-payment]
+verify_jwt = true
+
+[functions.payos-webhook]
+verify_jwt = false
