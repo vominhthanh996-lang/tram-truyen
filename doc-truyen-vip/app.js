@@ -58,6 +58,12 @@ const remoteComments = {};
 let authSession = null;
 let authUser = null;
 let userVipUntil = null;
+let accountSummary = {
+  wallet: { balance_vnd: 0, coin_balance: 0 },
+  progress: [],
+  unlocked: [],
+  vip: []
+};
 
 function defaultLastRead() {
   return {
@@ -120,6 +126,19 @@ function hasAccountVip() {
   return userVipUntil && new Date(userVipUntil).getTime() > Date.now();
 }
 
+function vipDaysLeft() {
+  if (!hasAccountVip()) return 0;
+  return Math.max(0, Math.ceil((new Date(userVipUntil).getTime() - Date.now()) / 86400000));
+}
+
+function currentAccountProgress() {
+  const remote = accountSummary.progress?.[0];
+  if (remote && getChapter(remote.story_id, remote.chapter_id)) {
+    return remote;
+  }
+  return state.lastRead;
+}
+
 async function loadVipEntitlement() {
   userVipUntil = null;
   if (!supabaseClient || !authUser) return;
@@ -133,6 +152,32 @@ async function loadVipEntitlement() {
   if (!error && data?.[0]?.active_until) userVipUntil = data[0].active_until;
 }
 
+function resetAccountSummary() {
+  accountSummary = {
+    wallet: { balance_vnd: 0, coin_balance: 0 },
+    progress: [],
+    unlocked: [],
+    vip: []
+  };
+}
+
+async function loadAccountSummary() {
+  resetAccountSummary();
+  if (!supabaseClient || !authUser) return;
+
+  const [walletRes, progressRes, unlockedRes, vipRes] = await Promise.all([
+    supabaseClient.from("account_wallets").select("balance_vnd,coin_balance").eq("user_id", authUser.id).maybeSingle(),
+    supabaseClient.from("reading_progress").select("story_id,chapter_id,updated_at").eq("user_id", authUser.id).order("updated_at", { ascending: false }),
+    supabaseClient.from("unlocked_chapters").select("story_id,chapter_id,source,created_at").eq("user_id", authUser.id).order("created_at", { ascending: false }),
+    supabaseClient.from("vip_entitlements").select("plan_id,active_until,source,created_at").eq("user_id", authUser.id).order("active_until", { ascending: false })
+  ]);
+
+  if (!walletRes.error && walletRes.data) accountSummary.wallet = walletRes.data;
+  if (!progressRes.error && progressRes.data) accountSummary.progress = progressRes.data;
+  if (!unlockedRes.error && unlockedRes.data) accountSummary.unlocked = unlockedRes.data;
+  if (!vipRes.error && vipRes.data) accountSummary.vip = vipRes.data;
+}
+
 async function upsertProfile() {
   if (!supabaseClient || !authUser) return;
   await supabaseClient
@@ -143,6 +188,20 @@ async function upsertProfile() {
       display_name: accountDisplayName(),
       updated_at: new Date().toISOString()
     }, { onConflict: "id" });
+}
+
+async function saveReadingProgress(storyId, chapterId) {
+  if (!supabaseClient || !authUser) return;
+  await supabaseClient
+    .from("reading_progress")
+    .upsert({
+      user_id: authUser.id,
+      story_id: storyId,
+      chapter_id: chapterId,
+      updated_at: new Date().toISOString()
+    }, { onConflict: "user_id,story_id" });
+  await loadAccountSummary();
+  renderAccount();
 }
 
 async function initAuth() {
@@ -159,6 +218,7 @@ async function initAuth() {
     await upsertProfile();
   }
   await loadVipEntitlement();
+  await loadAccountSummary();
   renderAccount();
 
   supabaseClient.auth.onAuthStateChange(async (_event, session) => {
@@ -170,6 +230,7 @@ async function initAuth() {
       await upsertProfile();
     }
     await loadVipEntitlement();
+    await loadAccountSummary();
     renderAccount();
     hydrateVisibleComments();
   });
@@ -687,10 +748,10 @@ function renderAccount() {
   }
 
   els.account.innerHTML = `
-    <span class="account-name">
+    <a class="account-name" href="#/account">
       <strong>${escapeHtml(accountDisplayName())}</strong>
-      <small>${hasAccountVip() ? `VIP đến ${new Date(userVipUntil).toLocaleDateString("vi-VN")}` : "Tài khoản thường"}</small>
-    </span>
+      <small>${hasAccountVip() ? `VIP còn ${vipDaysLeft()} ngày` : "Tài khoản thường"}</small>
+    </a>
     <button class="btn btn-secondary" data-sign-out>Thoát</button>
   `;
 }
@@ -983,6 +1044,7 @@ function renderReader(storyId, chapterId) {
 
   state.lastRead = { storyId, chapterId };
   saveState();
+  saveReadingProgress(storyId, chapterId).catch(() => {});
 
   els.view.innerHTML = `
     <article class="reader">
@@ -1095,6 +1157,108 @@ function renderAdmin() {
   `;
 }
 
+function renderAccountPage() {
+  if (!supabaseClient) {
+    els.view.innerHTML = emptyState("Chưa cấu hình Supabase.");
+    return;
+  }
+  if (!isLoggedIn()) {
+    els.view.innerHTML = `
+      <div class="page-title">
+        <div>
+          <span class="eyebrow">Tài khoản</span>
+          <h1>Đăng nhập để lưu VIP và tiến độ đọc</h1>
+        </div>
+        <button class="btn btn-primary" data-open-auth>Đăng nhập</button>
+      </div>
+      <section class="panel">
+        <p class="muted">Sau khi đăng nhập, hệ thống sẽ biết tài khoản nào có VIP, còn bao nhiêu ngày, ví còn bao nhiêu, đang đọc tới chương nào và đã mở chương nào.</p>
+      </section>
+    `;
+    return;
+  }
+
+  const progress = currentAccountProgress();
+  const progressStory = getStory(progress.story_id || progress.storyId) || stories[0];
+  const progressChapter = getChapter(progressStory.id, progress.chapter_id || progress.chapterId) || progressStory.chapters[0];
+  const activeVip = accountSummary.vip.filter((item) => new Date(item.active_until).getTime() > Date.now());
+  const unlockedCount = accountSummary.unlocked.length;
+  const wallet = accountSummary.wallet || { balance_vnd: 0, coin_balance: 0 };
+
+  els.view.innerHTML = `
+    <div class="page-title">
+      <div>
+        <span class="eyebrow">Tài khoản</span>
+        <h1>${escapeHtml(accountDisplayName())}</h1>
+        <p class="muted">${escapeHtml(accountEmail())}</p>
+      </div>
+      <button class="btn btn-secondary" data-sign-out>Đăng xuất</button>
+    </div>
+
+    <section class="metrics-grid">
+      <div class="metric"><span class="muted">VIP</span><strong>${hasAccountVip() ? `${vipDaysLeft()} ngày` : "Chưa có"}</strong></div>
+      <div class="metric"><span class="muted">Số dư</span><strong>${money(wallet.balance_vnd || 0)}</strong></div>
+      <div class="metric"><span class="muted">Xu</span><strong>${Number(wallet.coin_balance || 0).toLocaleString("vi-VN")}</strong></div>
+      <div class="metric"><span class="muted">Chương đã mở</span><strong>${unlockedCount}</strong></div>
+    </section>
+
+    <section class="panel account-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Đang đọc</span>
+          <h2>${progressChapter.title}</h2>
+        </div>
+        <a class="btn btn-primary" href="#/read/${progressStory.id}/${progressChapter.id}">Đọc tiếp</a>
+      </div>
+      <p class="muted">${progressStory.title}</p>
+    </section>
+
+    <section class="panel account-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">VIP</span>
+          <h2>Lịch sử gói</h2>
+        </div>
+        <span class="status-chip ${hasAccountVip() ? "vip" : ""}">${hasAccountVip() ? "Đang hoạt động" : "Chưa kích hoạt"}</span>
+      </div>
+      ${activeVip.length ? `
+        <div class="account-list">
+          ${activeVip.map((item) => `
+            <article class="account-list-item">
+              <strong>${escapeHtml(item.plan_id)}</strong>
+              <span>Còn tới ${new Date(item.active_until).toLocaleString("vi-VN")} · ${escapeHtml(item.source || "payment")}</span>
+            </article>
+          `).join("")}
+        </div>
+      ` : `<p class="muted">Tài khoản này chưa có VIP. Khi payment bật, gói mua sẽ ghi vào đây.</p>`}
+    </section>
+
+    <section class="panel account-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Mở khóa</span>
+          <h2>Chương đã mở</h2>
+        </div>
+        <span class="status-chip">${unlockedCount} chương</span>
+      </div>
+      ${unlockedCount ? `
+        <div class="account-list">
+          ${accountSummary.unlocked.slice(0, 20).map((item) => {
+            const story = getStory(item.story_id);
+            const chapter = getChapter(item.story_id, item.chapter_id);
+            return `
+              <article class="account-list-item">
+                <strong>${escapeHtml(chapter?.title || item.chapter_id)}</strong>
+                <span>${escapeHtml(story?.title || item.story_id)} · ${new Date(item.created_at).toLocaleString("vi-VN")}</span>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      ` : `<p class="muted">Hiện toàn bộ truyện đang free nên chưa cần mở khóa chương riêng.</p>`}
+    </section>
+  `;
+}
+
 function openAuthModal() {
   if (!supabaseClient) {
     toast("Chưa cấu hình Supabase Auth.");
@@ -1103,20 +1267,67 @@ function openAuthModal() {
   els.checkout.innerHTML = `
     <span class="eyebrow">Tài khoản</span>
     <h2 id="checkoutTitle">Đăng nhập Truyện 2K</h2>
-    <p class="muted">Nhập email để nhận link đăng nhập. Tài khoản này dùng để ghi nhận bình luận và sau này ghi nhận gói VIP đã mua.</p>
+    <p class="muted">Tài khoản dùng để ghi nhận bình luận, VIP, số dư, chương đã mở và tiến độ đọc.</p>
     <form class="auth-form" data-auth-form>
       <label>
         <span>Email</span>
         <input name="email" type="email" autocomplete="email" placeholder="ban@example.com" required />
       </label>
       <label>
+        <span>Mật khẩu</span>
+        <input name="password" type="password" autocomplete="current-password" minlength="6" placeholder="Tối thiểu 6 ký tự" />
+      </label>
+      <label>
         <span>Tên hiển thị</span>
         <input name="displayName" maxlength="40" autocomplete="nickname" placeholder="Tên độc giả" value="${escapeHtml(state.commenterName || "")}" />
       </label>
-      <button class="btn btn-primary" type="submit">Gửi link đăng nhập</button>
+      <div class="auth-actions">
+        <button class="btn btn-primary" type="submit" data-auth-action="signin">Đăng nhập</button>
+        <button class="btn btn-secondary" type="submit" data-auth-action="signup">Tạo tài khoản</button>
+        <button class="btn btn-secondary" type="submit" data-auth-action="magic">Gửi link email</button>
+      </div>
     </form>
   `;
   els.modal.hidden = false;
+}
+
+async function signInWithPassword(email, password) {
+  if (!supabaseClient) return false;
+  const cleanedEmail = String(email || "").trim().toLowerCase();
+  if (!cleanedEmail || !password) {
+    toast("Nhập email và mật khẩu trước nha.");
+    return false;
+  }
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: cleanedEmail,
+    password
+  });
+  if (error) throw error;
+  toast("Đã đăng nhập.");
+  return true;
+}
+
+async function signUpWithPassword(email, password, displayName) {
+  if (!supabaseClient) return false;
+  const cleanedEmail = String(email || "").trim().toLowerCase();
+  const cleanedName = cleanCommentAuthor(displayName || cleanedEmail.split("@")[0]);
+  if (!cleanedEmail || !password) {
+    toast("Nhập email và mật khẩu trước nha.");
+    return false;
+  }
+  state.commenterName = cleanedName;
+  saveState();
+  const { error } = await supabaseClient.auth.signUp({
+    email: cleanedEmail,
+    password,
+    options: {
+      data: { display_name: cleanedName },
+      emailRedirectTo: `${location.origin}${location.pathname}`
+    }
+  });
+  if (error) throw error;
+  toast("Đã tạo tài khoản. Nếu Supabase yêu cầu xác nhận, mở email để xác nhận.");
+  return true;
 }
 
 async function sendLoginLink(email, displayName) {
@@ -1227,6 +1438,7 @@ function route() {
   else if (routeName === "library") renderLibrary();
   else if (routeName === "story") renderStory(id);
   else if (routeName === "read") renderReader(id, chapterId);
+  else if (routeName === "account") renderAccountPage();
   else if (routeName === "wallet") renderLibrary();
   else if (routeName === "admin") renderAdmin();
   else renderNotFound();
@@ -1303,18 +1515,28 @@ document.addEventListener("submit", async (event) => {
   const authForm = event.target.closest("[data-auth-form]");
   if (authForm) {
     event.preventDefault();
-    const button = authForm.querySelector("button[type='submit']");
+    const button = event.submitter || authForm.querySelector("button[type='submit']");
+    const action = button?.dataset.authAction || "signin";
+    const email = authForm.elements.email.value;
+    const password = authForm.elements.password.value;
+    const displayName = authForm.elements.displayName.value;
     button.disabled = true;
-    button.textContent = "Đang gửi...";
+    const originalLabel = button.textContent;
+    button.textContent = "Đang xử lý...";
     try {
-      if (await sendLoginLink(authForm.elements.email.value, authForm.elements.displayName.value)) {
+      const ok = action === "signup"
+        ? await signUpWithPassword(email, password, displayName)
+        : action === "magic"
+          ? await sendLoginLink(email, displayName)
+          : await signInWithPassword(email, password);
+      if (ok) {
         els.modal.hidden = true;
       }
     } catch {
-      toast("Chưa gửi được link đăng nhập. Kiểm tra email hoặc Supabase Auth.");
+      toast("Chưa xử lý được tài khoản. Kiểm tra email/mật khẩu hoặc xác nhận email.");
     } finally {
       button.disabled = false;
-      button.textContent = "Gửi link đăng nhập";
+      button.textContent = originalLabel;
     }
     return;
   }

@@ -56,12 +56,48 @@ create table if not exists public.vip_entitlements (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.account_wallets (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  balance_vnd integer not null default 0,
+  coin_balance integer not null default 0,
+  updated_at timestamptz not null default now(),
+  constraint account_wallets_non_negative check (
+    balance_vnd >= 0 and coin_balance >= 0
+  )
+);
+
+create table if not exists public.reading_progress (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  story_id text not null,
+  chapter_id text not null,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, story_id)
+);
+
+create table if not exists public.unlocked_chapters (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  story_id text not null,
+  chapter_id text not null,
+  source text not null default 'purchase',
+  created_at timestamptz not null default now(),
+  primary key (user_id, story_id, chapter_id)
+);
+
 create index if not exists vip_entitlements_user_active_idx
   on public.vip_entitlements (user_id, active_until desc);
+
+create index if not exists reading_progress_user_updated_idx
+  on public.reading_progress (user_id, updated_at desc);
+
+create index if not exists unlocked_chapters_user_idx
+  on public.unlocked_chapters (user_id, created_at desc);
 
 alter table public.comments enable row level security;
 alter table public.profiles enable row level security;
 alter table public.vip_entitlements enable row level security;
+alter table public.account_wallets enable row level security;
+alter table public.reading_progress enable row level security;
+alter table public.unlocked_chapters enable row level security;
 
 drop policy if exists "Public can read visible comments" on public.comments;
 create policy "Public can read visible comments"
@@ -107,6 +143,42 @@ create policy "Users can update own profile"
 drop policy if exists "Users can read own VIP entitlement" on public.vip_entitlements;
 create policy "Users can read own VIP entitlement"
   on public.vip_entitlements
+  for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can read own wallet" on public.account_wallets;
+create policy "Users can read own wallet"
+  on public.account_wallets
+  for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can read own reading progress" on public.reading_progress;
+create policy "Users can read own reading progress"
+  on public.reading_progress
+  for select
+  to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "Users can save own reading progress" on public.reading_progress;
+create policy "Users can save own reading progress"
+  on public.reading_progress
+  for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own reading progress" on public.reading_progress;
+create policy "Users can update own reading progress"
+  on public.reading_progress
+  for update
+  to authenticated
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+drop policy if exists "Users can read own unlocked chapters" on public.unlocked_chapters;
+create policy "Users can read own unlocked chapters"
+  on public.unlocked_chapters
   for select
   to authenticated
   using (auth.uid() = user_id);
