@@ -8,7 +8,7 @@
       "duration": 785.921625,
       "provider": "edge",
       "verified": true,
-      "verifiedAt": "2026-06-24T07:59:30.681797+00:00"
+      "verifiedAt": "2026-06-24T08:28:50.107754+00:00"
     },
     {
       "chapterId": "c001",
@@ -18,7 +18,17 @@
       "duration": 821.329958,
       "provider": "edge",
       "verified": true,
-      "verifiedAt": "2026-06-24T07:59:29.945348+00:00"
+      "verifiedAt": "2026-06-24T08:28:47.337849+00:00"
+    },
+    {
+      "chapterId": "c002",
+      "preset": "nam-tram",
+      "file": "c002-nam-tram.mp3",
+      "size": 8458389,
+      "duration": 1027.015625,
+      "provider": "edge",
+      "verified": true,
+      "verifiedAt": "2026-06-25T02:03:10.844001+00:00"
     },
     {
       "chapterId": "c002",
@@ -28,7 +38,17 @@
       "duration": 1080.460667,
       "provider": "edge",
       "verified": true,
-      "verifiedAt": "2026-06-24T07:59:31.345245+00:00"
+      "verifiedAt": "2026-06-24T08:28:51.157089+00:00"
+    },
+    {
+      "chapterId": "c003",
+      "preset": "nam-tram",
+      "file": "c003-nam-tram.mp3",
+      "size": 7638237,
+      "duration": 928.453667,
+      "provider": "edge",
+      "verified": true,
+      "verifiedAt": "2026-06-25T02:09:55.841635+00:00"
     },
     {
       "chapterId": "c003",
@@ -38,7 +58,7 @@
       "duration": 978.786875,
       "provider": "edge",
       "verified": true,
-      "verifiedAt": "2026-06-24T04:41:11.295125+00:00"
+      "verifiedAt": "2026-06-24T08:59:11.359642+00:00"
     },
     {
       "chapterId": "c004",
@@ -48,7 +68,7 @@
       "duration": 894.385958,
       "provider": "edge",
       "verified": true,
-      "verifiedAt": "2026-06-24T04:41:11.377820+00:00"
+      "verifiedAt": "2026-06-24T09:41:03.966064+00:00"
     },
     {
       "chapterId": "c005",
