@@ -51,7 +51,13 @@ const sharedCommentsEnabled = Boolean(
   !supabaseConfig.url.includes("YOUR_") &&
   !supabaseConfig.anonKey.includes("YOUR_")
 );
+const supabaseClient = sharedCommentsEnabled && window.supabase
+  ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey)
+  : null;
 const remoteComments = {};
+let authSession = null;
+let authUser = null;
+let userVipUntil = null;
 
 function defaultLastRead() {
   return {
@@ -90,6 +96,83 @@ function loadState() {
 function saveState() {
   localStorage.setItem(storageKey, JSON.stringify(state));
   renderAccount();
+}
+
+function accountDisplayName() {
+  return (
+    authUser?.user_metadata?.display_name ||
+    authUser?.user_metadata?.name ||
+    authUser?.email?.split("@")[0] ||
+    state.commenterName ||
+    "Độc giả"
+  );
+}
+
+function accountEmail() {
+  return authUser?.email || "";
+}
+
+function isLoggedIn() {
+  return Boolean(authUser?.id);
+}
+
+function hasAccountVip() {
+  return userVipUntil && new Date(userVipUntil).getTime() > Date.now();
+}
+
+async function loadVipEntitlement() {
+  userVipUntil = null;
+  if (!supabaseClient || !authUser) return;
+  const { data, error } = await supabaseClient
+    .from("vip_entitlements")
+    .select("active_until")
+    .eq("user_id", authUser.id)
+    .gt("active_until", new Date().toISOString())
+    .order("active_until", { ascending: false })
+    .limit(1);
+  if (!error && data?.[0]?.active_until) userVipUntil = data[0].active_until;
+}
+
+async function upsertProfile() {
+  if (!supabaseClient || !authUser) return;
+  await supabaseClient
+    .from("profiles")
+    .upsert({
+      id: authUser.id,
+      email: accountEmail(),
+      display_name: accountDisplayName(),
+      updated_at: new Date().toISOString()
+    }, { onConflict: "id" });
+}
+
+async function initAuth() {
+  if (!supabaseClient) {
+    renderAccount();
+    return;
+  }
+  const { data } = await supabaseClient.auth.getSession();
+  authSession = data?.session || null;
+  authUser = authSession?.user || null;
+  if (authUser) {
+    state.commenterName = accountDisplayName();
+    saveState();
+    await upsertProfile();
+  }
+  await loadVipEntitlement();
+  renderAccount();
+
+  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    authSession = session || null;
+    authUser = authSession?.user || null;
+    if (authUser) {
+      state.commenterName = accountDisplayName();
+      saveState();
+      await upsertProfile();
+    }
+    await loadVipEntitlement();
+    renderAccount();
+    hydrateVisibleComments();
+  });
 }
 
 function normalizeText(value) {
@@ -361,7 +444,7 @@ function money(value) {
 }
 
 function isVip() {
-  return state.user.vipUntil && new Date(state.user.vipUntil).getTime() > Date.now();
+  return hasAccountVip() || (state.user.vipUntil && new Date(state.user.vipUntil).getTime() > Date.now());
 }
 
 function getStory(storyId) {
@@ -409,7 +492,7 @@ async function supabaseRequest(path, options = {}) {
     ...options,
     headers: {
       apikey: supabaseConfig.anonKey,
-      Authorization: `Bearer ${supabaseConfig.anonKey}`,
+      Authorization: `Bearer ${authSession?.access_token || supabaseConfig.anonKey}`,
       "Content-Type": "application/json",
       ...(options.headers || {})
     }
@@ -462,6 +545,8 @@ async function addComment(storyId, chapterId, author, text) {
         target_key: key,
         story_id: storyId,
         chapter_id: chapterId === "story" ? null : chapterId,
+        user_id: authUser?.id || null,
+        user_email: accountEmail() || null,
         author: cleanedAuthor,
         body: cleaned
       })
@@ -585,9 +670,28 @@ function unlockChapter(storyId, chapter) {
 }
 
 function renderAccount() {
+  if (!supabaseClient) {
+    els.account.innerHTML = `
+      <span class="status-chip vip">Đọc miễn phí</span>
+      <a class="btn btn-primary" href="#/library">Chọn truyện</a>
+    `;
+    return;
+  }
+
+  if (!isLoggedIn()) {
+    els.account.innerHTML = `
+      <span class="status-chip">Chưa đăng nhập</span>
+      <button class="btn btn-primary" data-open-auth>Đăng nhập</button>
+    `;
+    return;
+  }
+
   els.account.innerHTML = `
-    <span class="status-chip vip">Đọc miễn phí</span>
-    <a class="btn btn-primary" href="#/library">Chọn truyện</a>
+    <span class="account-name">
+      <strong>${escapeHtml(accountDisplayName())}</strong>
+      <small>${hasAccountVip() ? `VIP đến ${new Date(userVipUntil).toLocaleDateString("vi-VN")}` : "Tài khoản thường"}</small>
+    </span>
+    <button class="btn btn-secondary" data-sign-out>Thoát</button>
   `;
 }
 
@@ -991,6 +1095,64 @@ function renderAdmin() {
   `;
 }
 
+function openAuthModal() {
+  if (!supabaseClient) {
+    toast("Chưa cấu hình Supabase Auth.");
+    return;
+  }
+  els.checkout.innerHTML = `
+    <span class="eyebrow">Tài khoản</span>
+    <h2 id="checkoutTitle">Đăng nhập Truyện 2K</h2>
+    <p class="muted">Nhập email để nhận link đăng nhập. Tài khoản này dùng để ghi nhận bình luận và sau này ghi nhận gói VIP đã mua.</p>
+    <form class="auth-form" data-auth-form>
+      <label>
+        <span>Email</span>
+        <input name="email" type="email" autocomplete="email" placeholder="ban@example.com" required />
+      </label>
+      <label>
+        <span>Tên hiển thị</span>
+        <input name="displayName" maxlength="40" autocomplete="nickname" placeholder="Tên độc giả" value="${escapeHtml(state.commenterName || "")}" />
+      </label>
+      <button class="btn btn-primary" type="submit">Gửi link đăng nhập</button>
+    </form>
+  `;
+  els.modal.hidden = false;
+}
+
+async function sendLoginLink(email, displayName) {
+  if (!supabaseClient) return false;
+  const cleanedEmail = String(email || "").trim().toLowerCase();
+  const cleanedName = cleanCommentAuthor(displayName || cleanedEmail.split("@")[0]);
+  if (!cleanedEmail) {
+    toast("Nhập email trước nha.");
+    return false;
+  }
+  state.commenterName = cleanedName;
+  saveState();
+  const { error } = await supabaseClient.auth.signInWithOtp({
+    email: cleanedEmail,
+    options: {
+      shouldCreateUser: true,
+      data: { display_name: cleanedName },
+      emailRedirectTo: `${location.origin}${location.pathname}`
+    }
+  });
+  if (error) throw error;
+  toast("Đã gửi link đăng nhập. Mở email rồi bấm link xác nhận.");
+  return true;
+}
+
+async function signOut() {
+  if (!supabaseClient) return;
+  await supabaseClient.auth.signOut();
+  authSession = null;
+  authUser = null;
+  userVipUntil = null;
+  renderAccount();
+  hydrateVisibleComments();
+  toast("Đã đăng xuất.");
+}
+
 function openCheckout(planId) {
   const plan = plans.find((item) => item.id === planId);
   if (!plan) {
@@ -1074,6 +1236,14 @@ function route() {
 }
 
 document.addEventListener("click", (event) => {
+  if (event.target.closest("[data-open-auth]")) {
+    openAuthModal();
+  }
+
+  if (event.target.closest("[data-sign-out]")) {
+    signOut();
+  }
+
   const checkoutButton = event.target.closest("[data-open-checkout]");
   if (checkoutButton) openCheckout(checkoutButton.dataset.openCheckout);
 
@@ -1130,6 +1300,25 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("submit", async (event) => {
+  const authForm = event.target.closest("[data-auth-form]");
+  if (authForm) {
+    event.preventDefault();
+    const button = authForm.querySelector("button[type='submit']");
+    button.disabled = true;
+    button.textContent = "Đang gửi...";
+    try {
+      if (await sendLoginLink(authForm.elements.email.value, authForm.elements.displayName.value)) {
+        els.modal.hidden = true;
+      }
+    } catch {
+      toast("Chưa gửi được link đăng nhập. Kiểm tra email hoặc Supabase Auth.");
+    } finally {
+      button.disabled = false;
+      button.textContent = "Gửi link đăng nhập";
+    }
+    return;
+  }
+
   const form = event.target.closest("[data-comment-form]");
   if (!form) return;
   event.preventDefault();
@@ -1321,4 +1510,5 @@ getSpeech()?.addEventListener?.("voiceschanged", () => {
 });
 
 renderAccount();
+initAuth();
 route();
