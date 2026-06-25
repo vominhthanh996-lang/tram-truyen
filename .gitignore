@@ -3,3 +3,5 @@
 doc-truyen-vip/audio/.chunks/
 **/__pycache__/
 *.pyc
+supabase-story-content.sql
+supabase-story-content-chunks/

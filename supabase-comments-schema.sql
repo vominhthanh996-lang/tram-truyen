@@ -56,6 +56,50 @@ create table if not exists public.vip_entitlements (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.stories (
+  id text primary key,
+  title text not null,
+  author text not null,
+  status text not null default 'Dang ra',
+  genre jsonb not null default '[]'::jsonb,
+  cover text,
+  summary text,
+  updated_at date,
+  reads integer not null default 0,
+  rating numeric not null default 0,
+  sort_order integer not null default 0,
+  is_active boolean not null default true,
+  db_updated_at timestamptz not null default now()
+);
+
+create table if not exists public.story_chapters (
+  story_id text not null references public.stories(id) on delete cascade,
+  chapter_id text not null,
+  sort_order integer not null default 0,
+  title text not null,
+  episode_title text,
+  free boolean not null default true,
+  price_coins integer not null default 0,
+  audio_url text,
+  audio_urls jsonb not null default '{}'::jsonb,
+  is_active boolean not null default true,
+  db_updated_at timestamptz not null default now(),
+  primary key (story_id, chapter_id),
+  constraint story_chapters_price_non_negative check (price_coins >= 0)
+);
+
+create table if not exists public.story_chapter_bodies (
+  story_id text not null,
+  chapter_id text not null,
+  body jsonb not null,
+  db_updated_at timestamptz not null default now(),
+  primary key (story_id, chapter_id),
+  foreign key (story_id, chapter_id)
+    references public.story_chapters(story_id, chapter_id)
+    on delete cascade,
+  constraint story_chapter_bodies_array check (jsonb_typeof(body) = 'array')
+);
+
 create table if not exists public.account_wallets (
   user_id uuid primary key references auth.users(id) on delete cascade,
   balance_vnd integer not null default 0,
@@ -107,6 +151,12 @@ create table if not exists public.coin_transactions (
 create index if not exists vip_entitlements_user_active_idx
   on public.vip_entitlements (user_id, active_until desc);
 
+create index if not exists stories_active_sort_idx
+  on public.stories (is_active, sort_order, title);
+
+create index if not exists story_chapters_story_sort_idx
+  on public.story_chapters (story_id, is_active, sort_order);
+
 create index if not exists reading_progress_user_updated_idx
   on public.reading_progress (user_id, updated_at desc);
 
@@ -119,6 +169,9 @@ create index if not exists coin_transactions_user_created_idx
 alter table public.comments enable row level security;
 alter table public.profiles enable row level security;
 alter table public.vip_entitlements enable row level security;
+alter table public.stories enable row level security;
+alter table public.story_chapters enable row level security;
+alter table public.story_chapter_bodies enable row level security;
 alter table public.account_wallets enable row level security;
 alter table public.reading_progress enable row level security;
 alter table public.unlocked_chapters enable row level security;
@@ -172,6 +225,20 @@ create policy "Users can read own VIP entitlement"
   for select
   to authenticated
   using (auth.uid() = user_id);
+
+drop policy if exists "Public can read active stories" on public.stories;
+create policy "Public can read active stories"
+  on public.stories
+  for select
+  to anon, authenticated
+  using (is_active = true);
+
+drop policy if exists "Public can read active story chapter metadata" on public.story_chapters;
+create policy "Public can read active story chapter metadata"
+  on public.story_chapters
+  for select
+  to anon, authenticated
+  using (is_active = true);
 
 drop policy if exists "Users can read own wallet" on public.account_wallets;
 create policy "Users can read own wallet"
@@ -241,9 +308,22 @@ declare
   v_user_id uuid := auth.uid();
   v_price integer := 0;
   v_balance integer := 0;
+  v_chapter_exists boolean := false;
 begin
   if v_user_id is null then
     raise exception 'LOGIN_REQUIRED' using errcode = '28000';
+  end if;
+
+  select exists (
+    select 1
+    from public.story_chapters
+    where story_id = p_story_id
+      and chapter_id = p_chapter_id
+      and is_active = true
+  ) into v_chapter_exists;
+
+  if not v_chapter_exists then
+    raise exception 'CHAPTER_NOT_FOUND' using errcode = 'P0002';
   end if;
 
   if exists (
@@ -262,9 +342,9 @@ begin
     return;
   end if;
 
-  select coalesce(price_coins, 0)
+  select case when free then 0 else coalesce(price_coins, 0) end
     into v_price
-    from public.paid_chapters
+    from public.story_chapters
     where story_id = p_story_id
       and chapter_id = p_chapter_id
       and is_active = true;
@@ -305,3 +385,123 @@ end;
 $$;
 
 grant execute on function public.unlock_chapter_with_coins(text, text) to authenticated;
+
+create or replace function public.get_story_catalog()
+returns jsonb
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select jsonb_build_object(
+    'plans', '[]'::jsonb,
+    'stories', coalesce(jsonb_agg(
+      jsonb_build_object(
+        'id', s.id,
+        'title', s.title,
+        'author', s.author,
+        'status', s.status,
+        'genre', s.genre,
+        'cover', s.cover,
+        'summary', s.summary,
+        'updatedAt', to_char(s.updated_at, 'YYYY-MM-DD'),
+        'reads', s.reads,
+        'rating', s.rating,
+        'chapters', coalesce((
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', c.chapter_id,
+              'title', c.title,
+              'episodeTitle', c.episode_title,
+              'free', c.free,
+              'price', c.price_coins,
+              'audioUrl', c.audio_url,
+              'audioUrls', c.audio_urls
+            )
+            order by c.sort_order
+          )
+          from public.story_chapters c
+          where c.story_id = s.id
+            and c.is_active = true
+        ), '[]'::jsonb)
+      )
+      order by s.sort_order, s.title
+    ), '[]'::jsonb)
+  )
+  from public.stories s
+  where s.is_active = true;
+$$;
+
+grant execute on function public.get_story_catalog() to anon, authenticated;
+
+create or replace function public.get_chapter_for_reader(
+  p_story_id text,
+  p_chapter_id text
+)
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_chapter public.story_chapters%rowtype;
+  v_body jsonb;
+  v_has_vip boolean := false;
+  v_is_unlocked boolean := false;
+  v_can_read boolean := false;
+begin
+  select *
+    into v_chapter
+    from public.story_chapters
+    where story_id = p_story_id
+      and chapter_id = p_chapter_id
+      and is_active = true;
+
+  if not found then
+    raise exception 'CHAPTER_NOT_FOUND' using errcode = 'P0002';
+  end if;
+
+  if v_user_id is not null then
+    select exists (
+      select 1
+      from public.vip_entitlements
+      where user_id = v_user_id
+        and active_until > now()
+    ) into v_has_vip;
+
+    select exists (
+      select 1
+      from public.unlocked_chapters
+      where user_id = v_user_id
+        and story_id = p_story_id
+        and chapter_id = p_chapter_id
+    ) into v_is_unlocked;
+  end if;
+
+  v_can_read := v_chapter.free or v_has_vip or v_is_unlocked;
+
+  if v_can_read then
+    select body
+      into v_body
+      from public.story_chapter_bodies
+      where story_id = p_story_id
+        and chapter_id = p_chapter_id;
+  end if;
+
+  return jsonb_build_object(
+    'id', v_chapter.chapter_id,
+    'title', v_chapter.title,
+    'episodeTitle', v_chapter.episode_title,
+    'free', v_chapter.free,
+    'price', v_chapter.price_coins,
+    'audioUrl', v_chapter.audio_url,
+    'audioUrls', v_chapter.audio_urls,
+    'can_read', v_can_read,
+    'body', case when v_can_read then coalesce(v_body, '[]'::jsonb) else null end
+  );
+end;
+$$;
+
+grant execute on function public.get_chapter_for_reader(text, text) to anon, authenticated;

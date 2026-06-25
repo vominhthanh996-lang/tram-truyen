@@ -26,10 +26,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Prepare public artifact
+        run: |
+          mkdir -p pages-dist
+          cp -a doc-truyen-vip/. pages-dist/
+          rm -f pages-dist/data.js
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: doc-truyen-vip
+          path: pages-dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

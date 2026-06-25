@@ -1,4 +1,6 @@
-const { stories, plans } = window.STORY_DATA;
+const initialStoryData = window.STORY_DATA || { stories: [], plans: [] };
+let stories = initialStoryData.stories || [];
+const plans = initialStoryData.plans || [];
 
 const els = {
   view: document.querySelector("#view"),
@@ -44,6 +46,9 @@ let speechState = {
 let isAudioSeeking = false;
 let audioWasPlayingBeforeSeek = false;
 let audioProgressFrame = 0;
+let storyCatalogReady = false;
+let storyCatalogError = "";
+const authorizedChapterCache = new Map();
 const supabaseConfig = window.SUPABASE_CONFIG || {};
 const sharedCommentsEnabled = Boolean(
   supabaseConfig.url &&
@@ -238,6 +243,74 @@ async function initAuth() {
     renderAccount();
     hydrateVisibleComments();
   });
+}
+
+function normalizeCatalogStory(story) {
+  return {
+    ...story,
+    genre: Array.isArray(story.genre) ? story.genre : [],
+    reads: Number(story.reads || 0),
+    rating: Number(story.rating || 0),
+    chapters: Array.isArray(story.chapters) ? story.chapters.map((chapter) => ({
+      ...chapter,
+      free: chapter.free !== false,
+      price: Number(chapter.price || chapter.price_coins || 0),
+      audioUrls: chapter.audioUrls || chapter.audio_urls || {}
+    })) : []
+  };
+}
+
+function hydrateLastReadFromCatalog() {
+  if (!stories.length) return;
+  if (!getChapter(state.lastRead?.storyId, state.lastRead?.chapterId)) {
+    state.lastRead = defaultLastRead();
+    saveState();
+  }
+}
+
+async function loadStoryCatalog() {
+  storyCatalogError = "";
+  if (!supabaseClient) {
+    storyCatalogError = "Chưa kết nối database truyện.";
+    storyCatalogReady = true;
+    return;
+  }
+
+  const { data, error } = await supabaseClient.rpc("get_story_catalog");
+  if (error) {
+    storyCatalogError = "Không tải được danh sách truyện từ database.";
+    stories = [];
+    storyCatalogReady = true;
+    return;
+  }
+
+  const payload = data || {};
+  stories = (payload.stories || []).map(normalizeCatalogStory);
+  hydrateLastReadFromCatalog();
+  storyCatalogReady = true;
+}
+
+async function loadChapterForReader(storyId, chapterId) {
+  const key = chapterKey(storyId, chapterId);
+  if (authorizedChapterCache.has(key)) return authorizedChapterCache.get(key);
+  if (!supabaseClient) throw new Error("DATABASE_REQUIRED");
+
+  const { data, error } = await supabaseClient.rpc("get_chapter_for_reader", {
+    p_story_id: storyId,
+    p_chapter_id: chapterId
+  });
+  if (error) throw error;
+
+  const chapter = {
+    ...data,
+    id: data.id || chapterId,
+    free: data.free !== false,
+    price: Number(data.price || 0),
+    body: Array.isArray(data.body) ? data.body : [],
+    audioUrls: data.audioUrls || data.audio_urls || {}
+  };
+  if (chapter.can_read) authorizedChapterCache.set(key, chapter);
+  return chapter;
 }
 
 function normalizeText(value) {
@@ -486,7 +559,7 @@ function seekGeneratedAudioToPercent(percent, resumeAfterSeek = true) {
   return true;
 }
 
-function playAudioForChapter(storyId, chapter) {
+async function playAudioForChapter(storyId, chapter) {
   const audio = currentGeneratedAudio();
   if (audio) {
     stopSpeech();
@@ -501,7 +574,16 @@ function playAudioForChapter(storyId, chapter) {
       });
     return;
   }
-  startSpeech(storyId, chapter);
+  try {
+    const dbChapter = await loadChapterForReader(storyId, chapter.id);
+    if (!dbChapter.can_read) {
+      toast("Mở khóa chương trước rồi mới nghe được.");
+      return;
+    }
+    startSpeech(storyId, { ...chapter, ...dbChapter });
+  } catch {
+    toast("Không tải được nội dung audio từ database.");
+  }
 }
 
 function money(value) {
@@ -1082,7 +1164,7 @@ function renderAudioPanel(story, chapter, readable, prev, next) {
   `;
 }
 
-function renderReader(storyId, chapterId) {
+async function renderReader(storyId, chapterId) {
   const story = getStory(storyId);
   const chapter = getChapter(storyId, chapterId);
   if (!story || !chapter) return renderNotFound();
@@ -1094,16 +1176,29 @@ function renderReader(storyId, chapterId) {
   const index = story.chapters.findIndex((item) => item.id === chapter.id);
   const prev = story.chapters[index - 1];
   const next = story.chapters[index + 1];
-  const readable = canRead(storyId, chapter);
+  let readable = canRead(storyId, chapter);
+  let readerChapter = chapter;
 
-  state.lastRead = { storyId, chapterId };
-  saveState();
-  saveReadingProgress(storyId, chapterId).catch(() => {});
+  if (readable) {
+    try {
+      const dbChapter = await loadChapterForReader(storyId, chapterId);
+      readable = Boolean(dbChapter.can_read);
+      readerChapter = { ...chapter, ...dbChapter };
+    } catch {
+      readable = false;
+    }
+  }
+
+  if (readable) {
+    state.lastRead = { storyId, chapterId };
+    saveState();
+    saveReadingProgress(storyId, chapterId).catch(() => {});
+  }
 
   els.view.innerHTML = `
     <article class="reader">
       <h1>${escapeHtml(chapter.title)}</h1>
-      <p class="muted reader-meta">${escapeHtml(story.title)} · Chương miễn phí</p>
+      <p class="muted reader-meta">${escapeHtml(story.title)} · ${chapter.free !== false ? "Chương miễn phí" : `${chapterPriceCoins(chapter).toLocaleString("vi-VN")} xu`}</p>
       <div class="reader-toolbar">
         <a class="btn btn-secondary" href="#/story/${story.id}">Danh sách chương</a>
         ${renderChapterNav(story, prev, next, "reader-nav-top")}
@@ -1115,7 +1210,7 @@ function renderReader(storyId, chapterId) {
       </div>
       ${
         readable
-          ? `${renderAudioPanel(story, chapter, readable, prev, next)}<section class="reader-content">${chapter.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`
+          ? `${renderAudioPanel(story, readerChapter, readable, prev, next)}<section class="reader-content">${readerChapter.body.map((p) => `<p>${escapeHtml(p)}</p>`).join("")}</section>`
           : paywallBlock(storyId, chapter)
       }
       ${renderChapterNav(story, prev, next, "reader-nav-bottom")}
@@ -1498,6 +1593,18 @@ function renderNotFound() {
   els.view.innerHTML = emptyState("Không tìm thấy trang này.");
 }
 
+function renderCatalogGate() {
+  if (!storyCatalogReady) {
+    els.view.innerHTML = emptyState("Đang tải dữ liệu truyện từ database...");
+    return false;
+  }
+  if (storyCatalogError || !stories.length) {
+    els.view.innerHTML = emptyState(storyCatalogError || "Database chưa có truyện nào.");
+    return false;
+  }
+  return true;
+}
+
 function toast(message) {
   const item = document.createElement("div");
   item.className = "toast";
@@ -1506,7 +1613,7 @@ function toast(message) {
   setTimeout(() => item.remove(), 3200);
 }
 
-function route() {
+async function route() {
   const hash = location.hash.replace(/^#/, "") || "/";
   const shouldScrollTop = hash !== activeRouteHash;
   if (shouldScrollTop) stopSpeech();
@@ -1514,10 +1621,13 @@ function route() {
   const [_, routeName, id, chapterId] = hash.split("/");
   document.body.classList.toggle("reader-dark", state.darkReader && routeName === "read");
   setActiveNav(hash);
+
+  if (!renderCatalogGate()) return;
+
   if (hash === "/") renderHome();
   else if (routeName === "library") renderLibrary();
   else if (routeName === "story") renderStory(id);
-  else if (routeName === "read") renderReader(id, chapterId);
+  else if (routeName === "read") await renderReader(id, chapterId);
   else if (routeName === "account") renderAccountPage();
   else if (routeName === "wallet") renderLibrary();
   else if (routeName === "admin") renderAdmin();
@@ -1563,7 +1673,7 @@ document.addEventListener("click", async (event) => {
   if (speakButton) {
     const [storyId, chapterId] = speakButton.dataset.speakChapter.split(":");
     const chapter = getChapter(storyId, chapterId);
-    if (chapter) playAudioForChapter(storyId, chapter);
+    if (chapter) await playAudioForChapter(storyId, chapter);
   }
 
   if (event.target.closest("[data-pause-speech]")) {
@@ -1815,5 +1925,6 @@ getSpeech()?.addEventListener?.("voiceschanged", () => {
 });
 
 renderAccount();
-initAuth();
 route();
+Promise.all([loadStoryCatalog(), initAuth()])
+  .finally(() => route());
