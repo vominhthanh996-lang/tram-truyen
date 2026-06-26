@@ -1,7 +1,9 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const SITE_URL = "https://vominhthanh996-lang.github.io/truyen-2k";
+const siteConfig = JSON.parse(await fs.readFile(path.resolve("tools/site-config.json"), "utf8"));
+const SITE_URL = siteConfig.siteUrl.replace(/\/$/, "");
+const STORY_SEO_BASE_PATH = (siteConfig.storySeoBasePath || "/truyen").replace(/^\/?/, "/").replace(/\/$/, "");
 const SUPABASE_URL = "https://lgjkyclvpzijvjepmncq.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_NQ-pBBYLNskZctSbYYPyfA_pQznXUYh";
 const OUT_DIR = path.resolve("doc-truyen-vip");
@@ -77,7 +79,7 @@ function pageShell({ title, description, canonical, body, schema, stylesheet }) 
 }
 
 function chapterUrl(storyId, chapterId) {
-  return `${SITE_URL}/truyen/${storyId}/chuong/${chapterId}/`;
+  return `${SITE_URL}${STORY_SEO_BASE_PATH}/${storyId}/chuong/${chapterId}/`;
 }
 
 function appReadUrl(storyId, chapterId) {
@@ -94,7 +96,7 @@ async function writeFile(filePath, content) {
 }
 
 async function removeOldSeoPages() {
-  await fs.rm(path.join(OUT_DIR, "truyen"), { recursive: true, force: true });
+  await fs.rm(path.join(OUT_DIR, STORY_SEO_BASE_PATH.replace(/^\//, "")), { recursive: true, force: true });
 }
 
 async function build() {
@@ -108,8 +110,8 @@ async function build() {
 
   for (const story of stories) {
     const storyId = story.id;
-    const storyDir = path.join(OUT_DIR, "truyen", storyId);
-    const storyCanonical = `${SITE_URL}/truyen/${storyId}/`;
+    const storyDir = path.join(OUT_DIR, STORY_SEO_BASE_PATH.replace(/^\//, ""), storyId);
+    const storyCanonical = `${SITE_URL}${STORY_SEO_BASE_PATH}/${storyId}/`;
     const storyDescription = metaDescription(`${story.title}. ${story.summary || ""} Đọc truyện mạt thế phế thổ tiếng Việt có audio tại Truyện 2K.`);
     const chapters = Array.isArray(story.chapters) ? story.chapters : [];
     const firstChapter = chapters[0];
@@ -219,6 +221,11 @@ ${sitemapUrls.map((item) => `  <url>
 </urlset>
 `;
   await writeFile(path.join(OUT_DIR, "sitemap.xml"), sitemap);
+  await writeFile(path.join(OUT_DIR, "robots.txt"), `User-agent: *
+Allow: /
+
+Sitemap: ${SITE_URL}/sitemap.xml
+`);
   console.log(`Generated ${sitemapUrls.length} SEO URLs.`);
 }
 

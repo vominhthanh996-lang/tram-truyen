@@ -87,4 +87,5 @@ if (-not $SkipPush) {
 }
 
 Write-Step "Done"
-Write-Host "Production URL: https://vominhthanh996-lang.github.io/truyen-2k/"
+$siteConfig = Get-Content -Raw -LiteralPath "tools\site-config.json" | ConvertFrom-Json
+Write-Host "Production URL: $($siteConfig.siteUrl)/"
