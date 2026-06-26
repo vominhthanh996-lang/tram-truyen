@@ -1029,6 +1029,14 @@ a {
   align-items: center;
 }
 
+.admin-coin-form {
+  margin-bottom: 16px;
+}
+
+.admin-subtable {
+  margin-top: 12px;
+}
+
 body.reader-dark {
   --bg: #080b12;
   --surface: #111827;

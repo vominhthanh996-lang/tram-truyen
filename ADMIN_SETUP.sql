@@ -83,6 +83,20 @@ create policy "Admins can update profiles"
   using (public.is_admin())
   with check (public.is_admin());
 
+drop policy if exists "Admins can create profiles" on public.profiles;
+create policy "Admins can create profiles"
+  on public.profiles
+  for insert
+  to authenticated
+  with check (public.is_admin());
+
+drop policy if exists "Admins can delete profiles" on public.profiles;
+create policy "Admins can delete profiles"
+  on public.profiles
+  for delete
+  to authenticated
+  using (public.is_admin());
+
 drop policy if exists "Admins can manage wallets" on public.account_wallets;
 create policy "Admins can manage wallets"
   on public.account_wallets
@@ -100,11 +114,21 @@ create policy "Admins can manage VIP entitlements"
   with check (public.is_admin());
 
 drop policy if exists "Admins can read reading progress" on public.reading_progress;
-create policy "Admins can read reading progress"
+drop policy if exists "Admins can manage reading progress" on public.reading_progress;
+create policy "Admins can manage reading progress"
   on public.reading_progress
-  for select
+  for all
   to authenticated
-  using (public.is_admin());
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "Admins can manage paid chapters" on public.paid_chapters;
+create policy "Admins can manage paid chapters"
+  on public.paid_chapters
+  for all
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
 
 drop policy if exists "Admins can manage unlocked chapters" on public.unlocked_chapters;
 create policy "Admins can manage unlocked chapters"
@@ -115,11 +139,85 @@ create policy "Admins can manage unlocked chapters"
   with check (public.is_admin());
 
 drop policy if exists "Admins can read coin transactions" on public.coin_transactions;
-create policy "Admins can read coin transactions"
+drop policy if exists "Admins can manage coin transactions" on public.coin_transactions;
+create policy "Admins can manage coin transactions"
   on public.coin_transactions
-  for select
+  for all
   to authenticated
-  using (public.is_admin());
+  using (public.is_admin())
+  with check (public.is_admin());
+
+create or replace function public.admin_adjust_user_coins(
+  p_email text,
+  p_amount integer,
+  p_reason text default 'admin_adjust'
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  target_user_id uuid;
+  new_balance integer;
+begin
+  if not public.is_admin() then
+    raise exception 'ADMIN_REQUIRED';
+  end if;
+
+  if p_amount = 0 then
+    raise exception 'AMOUNT_MUST_NOT_BE_ZERO';
+  end if;
+
+  select id
+    into target_user_id
+    from public.profiles
+   where lower(email) = lower(btrim(p_email))
+   limit 1;
+
+  if target_user_id is null then
+    select id
+      into target_user_id
+      from auth.users
+     where lower(email) = lower(btrim(p_email))
+     limit 1;
+  end if;
+
+  if target_user_id is null then
+    raise exception 'USER_NOT_FOUND';
+  end if;
+
+  insert into public.profiles (id, email, display_name, updated_at)
+  select id, email, split_part(email, '@', 1), now()
+    from auth.users
+   where id = target_user_id
+  on conflict (id) do update
+    set email = excluded.email,
+        updated_at = excluded.updated_at;
+
+  insert into public.account_wallets (user_id, balance_vnd, coin_balance, updated_at)
+  values (target_user_id, 0, 0, now())
+  on conflict (user_id) do nothing;
+
+  update public.account_wallets
+     set coin_balance = greatest(0, coin_balance + p_amount),
+         updated_at = now()
+   where user_id = target_user_id
+   returning coin_balance into new_balance;
+
+  insert into public.coin_transactions (user_id, amount, reason)
+  values (target_user_id, p_amount, coalesce(nullif(btrim(p_reason), ''), 'admin_adjust'));
+
+  return jsonb_build_object(
+    'user_id', target_user_id,
+    'amount', p_amount,
+    'coin_balance', new_balance
+  );
+end;
+$$;
+
+revoke all on function public.admin_adjust_user_coins(text, integer, text) from public;
+grant execute on function public.admin_adjust_user_coins(text, integer, text) to authenticated;
 
 do $$
 declare

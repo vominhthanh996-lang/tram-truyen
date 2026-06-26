@@ -73,7 +73,8 @@ let adminState = {
   comments: [],
   profiles: [],
   wallets: [],
-  vip: []
+  vip: [],
+  transactions: []
 };
 let accountSummary = {
   wallet: { balance_vnd: 0, coin_balance: 0 },
@@ -218,7 +219,8 @@ function resetAdminState() {
     comments: [],
     profiles: [],
     wallets: [],
-    vip: []
+    vip: [],
+    transactions: []
   };
 }
 
@@ -236,7 +238,8 @@ async function loadAdminData() {
     commentRes,
     profileRes,
     walletRes,
-    vipRes
+    vipRes,
+    txRes
   ] = await Promise.all([
     supabaseClient.from("stories").select("*").order("sort_order", { ascending: true }),
     selectedStoryId
@@ -248,11 +251,12 @@ async function loadAdminData() {
     supabaseClient.from("comments").select("id,target_key,story_id,chapter_id,author,body,user_email,is_hidden,created_at").order("created_at", { ascending: false }).limit(60),
     supabaseClient.from("profiles").select("id,email,display_name,updated_at").order("updated_at", { ascending: false }).limit(80),
     supabaseClient.from("account_wallets").select("user_id,balance_vnd,coin_balance,updated_at"),
-    supabaseClient.from("vip_entitlements").select("user_id,plan_id,active_until,source,created_at").order("active_until", { ascending: false })
+    supabaseClient.from("vip_entitlements").select("user_id,plan_id,active_until,source,created_at").order("active_until", { ascending: false }),
+    supabaseClient.from("coin_transactions").select("user_id,amount,reason,story_id,chapter_id,created_at").order("created_at", { ascending: false }).limit(80)
   ]);
 
   adminState.loading = false;
-  const firstError = [storyRes, chapterRes, bodyRes, commentRes, profileRes, walletRes, vipRes].find((item) => item.error)?.error;
+  const firstError = [storyRes, chapterRes, bodyRes, commentRes, profileRes, walletRes, vipRes, txRes].find((item) => item.error)?.error;
   if (firstError) {
     adminState.error = firstError.message || "Không tải được dữ liệu admin.";
     return;
@@ -265,6 +269,7 @@ async function loadAdminData() {
   adminState.profiles = profileRes.data || [];
   adminState.wallets = walletRes.data || [];
   adminState.vip = vipRes.data || [];
+  adminState.transactions = txRes.data || [];
 
   const resolvedChapterId = selectedChapterId || adminState.chapters[0]?.chapter_id || "";
   state.admin = { storyId: selectedStoryId, chapterId: resolvedChapterId };
@@ -1427,6 +1432,31 @@ async function renderAdmin() {
       <div class="metric"><span class="muted">Comment ẩn</span><strong>${hiddenComments}</strong></div>
     </section>
 
+    <section class="panel admin-panel">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Quyền tối cao</span>
+          <h2>Cộng / trừ xu tài khoản bất kỳ</h2>
+        </div>
+      </div>
+      <form class="admin-form admin-coin-form" data-admin-coin-adjust-form>
+        <label>
+          <span>Email account</span>
+          <input name="email" type="email" placeholder="docgia@example.com" required />
+        </label>
+        <label>
+          <span>Số xu cộng/trừ</span>
+          <input name="amount" type="number" placeholder="Ví dụ 1000 hoặc -500" required />
+        </label>
+        <label class="admin-field-wide">
+          <span>Lý do ghi lịch sử</span>
+          <input name="reason" value="admin_adjust" />
+        </label>
+        <button class="btn btn-primary" type="submit">Cập nhật xu và ghi lịch sử</button>
+      </form>
+      ${renderAdminTransactions()}
+    </section>
+
     <section class="admin-layout">
       <article class="panel admin-panel">
         <div class="section-head compact">
@@ -1569,6 +1599,29 @@ function renderAdminUsers() {
                 </form>
               </td>
               <td><span class="muted">${new Date(profile.updated_at || Date.now()).toLocaleString("vi-VN")}</span></td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderAdminTransactions() {
+  if (!adminState.transactions.length) return `<p class="muted">Chưa có lịch sử xu.</p>`;
+  return `
+    <table class="admin-table admin-subtable">
+      <thead><tr><th>Email</th><th>Số xu</th><th>Lý do</th><th>Thời gian</th></tr></thead>
+      <tbody>
+        ${adminState.transactions.slice(0, 20).map((tx) => {
+          const profile = adminState.profiles.find((item) => item.id === tx.user_id) || {};
+          const amount = Number(tx.amount || 0);
+          return `
+            <tr>
+              <td>${escapeHtml(profile.email || tx.user_id)}</td>
+              <td><strong>${amount > 0 ? "+" : ""}${amount.toLocaleString("vi-VN")}</strong></td>
+              <td>${escapeHtml(tx.reason || "")}</td>
+              <td>${new Date(tx.created_at).toLocaleString("vi-VN")}</td>
             </tr>
           `;
         }).join("")}
@@ -1956,6 +2009,25 @@ async function saveAdminWallet(form, userId) {
   toast("Đã lưu ví user.");
 }
 
+async function adjustAdminCoins(form) {
+  const values = Object.fromEntries(new FormData(form).entries());
+  const email = normalizeText(values.email).trim().toLowerCase();
+  const amount = Number(values.amount || 0);
+  const reason = normalizeText(values.reason).trim() || "admin_adjust";
+  if (!email || !amount) {
+    toast("Nhập email và số xu khác 0.");
+    return;
+  }
+
+  const { error } = await supabaseClient.rpc("admin_adjust_user_coins", {
+    p_email: email,
+    p_amount: amount,
+    p_reason: reason
+  });
+  if (error) throw error;
+  toast(`${amount > 0 ? "Đã cộng" : "Đã trừ"} ${Math.abs(amount).toLocaleString("vi-VN")} xu cho ${email}.`);
+}
+
 async function saveAdminVip(form, userId) {
   const values = Object.fromEntries(new FormData(form).entries());
   if (!values.active_until) {
@@ -2186,6 +2258,22 @@ document.addEventListener("submit", async (event) => {
       await renderAdmin();
     } catch (error) {
       toast(error.message || "Chưa lưu được ví.");
+      button.disabled = false;
+    }
+    return;
+  }
+
+  const adminCoinAdjustForm = event.target.closest("[data-admin-coin-adjust-form]");
+  if (adminCoinAdjustForm) {
+    event.preventDefault();
+    const button = adminCoinAdjustForm.querySelector("button[type='submit']");
+    button.disabled = true;
+    try {
+      await adjustAdminCoins(adminCoinAdjustForm);
+      adminCoinAdjustForm.reset();
+      await renderAdmin();
+    } catch (error) {
+      toast(error.message || "Chưa cập nhật được xu.");
       button.disabled = false;
     }
     return;
