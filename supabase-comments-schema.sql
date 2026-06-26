@@ -186,13 +186,18 @@ create policy "Public can read visible comments"
   using (is_hidden = false);
 
 drop policy if exists "Public can create comments" on public.comments;
-create policy "Public can create comments"
+drop policy if exists "Authenticated users can create comments" on public.comments;
+create policy "Authenticated users can create comments"
   on public.comments
   for insert
-  to anon, authenticated
+  to authenticated
   with check (
     is_hidden = false
-    and (auth.uid() is null or user_id is null or auth.uid() = user_id)
+    and auth.uid() = user_id
+    and (
+      user_email is null
+      or lower(user_email) = lower(coalesce(auth.jwt() ->> 'email', ''))
+    )
     and char_length(btrim(author)) between 1 and 40
     and char_length(btrim(body)) between 2 and 800
   );

@@ -795,6 +795,11 @@ async function addComment(storyId, chapterId, author, text) {
   saveState();
 
   if (sharedCommentsEnabled) {
+    if (!isLoggedIn()) {
+      openAuthModal();
+      toast("Đăng nhập trước rồi gửi bình luận chung nha.");
+      return false;
+    }
     const key = commentKey(storyId, chapterId);
     await supabaseRequest("comments", {
       method: "POST",
@@ -835,20 +840,14 @@ function renderComments(storyId, chapterId = "story") {
   const title = chapterId === "story" ? "Bình luận truyện" : "Bình luận chương";
   const targetKey = commentKey(storyId, chapterId);
   const commenterName = escapeHtml(state.commenterName || "");
-  return `
-    <section class="comments-panel" data-comments-scope="${targetKey}" data-comments-story="${storyId}" data-comments-chapter="${chapterId}">
-      <div class="section-head compact">
-        <div>
-          <span class="eyebrow">Cộng đồng</span>
-          <h2>${title}</h2>
-        </div>
-        <span class="status-chip">${comments.length} bình luận</span>
+  const commentForm = sharedCommentsEnabled && !isLoggedIn()
+    ? `
+      <div class="comment-login">
+        <p class="muted">Đăng nhập để gửi bình luận chung. Mọi người vẫn đọc được bình luận đã duyệt.</p>
+        <button class="btn btn-primary" type="button" data-open-auth>Đăng nhập</button>
       </div>
-      <p class="comment-mode ${sharedCommentsEnabled ? "shared" : "local"}">
-        ${sharedCommentsEnabled
-          ? "Bình luận chung: mọi độc giả đều thấy sau khi gửi."
-          : "Chưa cấu hình Supabase nên bình luận tạm lưu trên trình duyệt này."}
-      </p>
+    `
+    : `
       <form class="comment-form" data-comment-form="${storyId}" data-comment-chapter="${chapterId}">
         <div class="comment-fields">
           <label>
@@ -863,6 +862,22 @@ function renderComments(storyId, chapterId = "story") {
         <input class="comment-honeypot" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" />
         <button class="btn btn-primary" type="submit">Gửi bình luận</button>
       </form>
+    `;
+  return `
+    <section class="comments-panel" data-comments-scope="${targetKey}" data-comments-story="${storyId}" data-comments-chapter="${chapterId}">
+      <div class="section-head compact">
+        <div>
+          <span class="eyebrow">Cộng đồng</span>
+          <h2>${title}</h2>
+        </div>
+        <span class="status-chip">${comments.length} bình luận</span>
+      </div>
+      <p class="comment-mode ${sharedCommentsEnabled ? "shared" : "local"}">
+        ${sharedCommentsEnabled
+          ? "Bình luận chung: đăng nhập để gửi, mọi độc giả đều thấy sau khi duyệt."
+          : "Chưa cấu hình Supabase nên bình luận tạm lưu trên trình duyệt này."}
+      </p>
+      ${commentForm}
       <div class="comment-list">
         ${comments.map((comment) => `
           <article class="comment-item">

@@ -512,6 +512,17 @@ a {
   gap: 10px;
 }
 
+.comment-login {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
 .auth-form {
   display: grid;
   gap: 12px;
@@ -1673,7 +1684,8 @@ body.reader-dark {
   .section-head,
   .page-title,
   .card-footer,
-  .paywall-actions {
+  .paywall-actions,
+  .comment-login {
     align-items: stretch;
     flex-direction: column;
   }
