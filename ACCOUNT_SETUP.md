@@ -1,11 +1,24 @@
 # Account va VIP
 
-Web dung Supabase Auth de dang nhap bang email magic link.
-Frontend hien ho tro 3 cach:
+Web dung Supabase Auth. Frontend hien ho tro:
 
 - Dang nhap bang email + mat khau.
-- Tao account bang email + mat khau.
-- Gui magic link qua email.
+- Tao account bang email + mat khau + ma OTP gui qua email.
+- Dang nhap bang ma OTP gui qua email.
+
+## Xac nhan email bang OTP
+
+Luon dung flow:
+
+1. User nhap email.
+2. Web goi `supabase.auth.signInWithOtp`.
+3. Supabase gui ma xac nhan qua email.
+4. User nhap ma tren web.
+5. Web goi `supabase.auth.verifyOtp({ type: "email" })`.
+6. Neu la tao account co mat khau, sau khi verify web goi `supabase.auth.updateUser({ password })`.
+
+Khi chua gan SMTP rieng, Supabase built-in email co the bi gioi han va co the vao Spam/Quang cao.
+Khi production that nen cau hinh SMTP rieng nhu Resend/Brevo, va domain gui mail co SPF/DKIM/DMARC de giam spam.
 
 ## Da cau hinh
 

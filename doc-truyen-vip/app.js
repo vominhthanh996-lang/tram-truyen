@@ -62,6 +62,7 @@ const remoteComments = {};
 let authSession = null;
 let authUser = null;
 let userVipUntil = null;
+let pendingEmailOtp = null;
 let accountSummary = {
   wallet: { balance_vnd: 0, coin_balance: 0 },
   progress: [],
@@ -1426,10 +1427,11 @@ function openAuthModal() {
     toast("Chưa cấu hình Supabase Auth.");
     return;
   }
+  pendingEmailOtp = null;
   els.checkout.innerHTML = `
     <span class="eyebrow">Tài khoản</span>
     <h2 id="checkoutTitle">Đăng nhập Truyện 2K</h2>
-    <p class="muted">Tài khoản dùng để ghi nhận bình luận, VIP, số dư, chương đã mở và tiến độ đọc.</p>
+    <p class="muted">Tạo tài khoản bằng mã xác nhận email. Mã có thể bị giới hạn khi chưa gắn SMTP riêng.</p>
     <form class="auth-form" data-auth-form>
       <label>
         <span>Email</span>
@@ -1445,12 +1447,32 @@ function openAuthModal() {
       </label>
       <div class="auth-actions">
         <button class="btn btn-primary" type="submit" data-auth-action="signin">Đăng nhập</button>
-        <button class="btn btn-secondary" type="submit" data-auth-action="signup">Tạo tài khoản</button>
-        <button class="btn btn-secondary" type="submit" data-auth-action="magic">Gửi link email</button>
+        <button class="btn btn-secondary" type="submit" data-auth-action="signup">Tạo tài khoản + gửi mã</button>
+        <button class="btn btn-secondary" type="submit" data-auth-action="otp">Gửi mã đăng nhập</button>
       </div>
     </form>
   `;
   els.modal.hidden = false;
+}
+
+function renderOtpModal() {
+  if (!pendingEmailOtp) return;
+  els.checkout.innerHTML = `
+    <span class="eyebrow">Xác nhận email</span>
+    <h2 id="checkoutTitle">Nhập mã xác nhận</h2>
+    <p class="muted">Mã đã gửi tới ${escapeHtml(pendingEmailOtp.email)}. Kiểm tra Inbox và Spam/Quảng cáo nếu chưa thấy.</p>
+    <form class="auth-form" data-otp-form>
+      <label>
+        <span>Mã xác nhận</span>
+        <input name="token" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Nhập mã trong email" required />
+      </label>
+      <div class="auth-actions">
+        <button class="btn btn-primary" type="submit">Xác nhận</button>
+        <button class="btn btn-secondary" type="button" data-resend-otp>Gửi lại mã</button>
+        <button class="btn btn-secondary" type="button" data-open-auth>Đổi email</button>
+      </div>
+    </form>
+  `;
 }
 
 async function signInWithPassword(email, password) {
@@ -1469,35 +1491,16 @@ async function signInWithPassword(email, password) {
   return true;
 }
 
-async function signUpWithPassword(email, password, displayName) {
-  if (!supabaseClient) return false;
-  const cleanedEmail = String(email || "").trim().toLowerCase();
-  const cleanedName = cleanCommentAuthor(displayName || cleanedEmail.split("@")[0]);
-  if (!cleanedEmail || !password) {
-    toast("Nhập email và mật khẩu trước nha.");
-    return false;
-  }
-  state.commenterName = cleanedName;
-  saveState();
-  const { error } = await supabaseClient.auth.signUp({
-    email: cleanedEmail,
-    password,
-    options: {
-      data: { display_name: cleanedName },
-      emailRedirectTo: `${location.origin}${location.pathname}`
-    }
-  });
-  if (error) throw error;
-  toast("Đã tạo tài khoản. Nếu Supabase yêu cầu xác nhận, mở email để xác nhận.");
-  return true;
-}
-
-async function sendLoginLink(email, displayName) {
+async function sendEmailOtp(email, displayName, password = "", mode = "signin") {
   if (!supabaseClient) return false;
   const cleanedEmail = String(email || "").trim().toLowerCase();
   const cleanedName = cleanCommentAuthor(displayName || cleanedEmail.split("@")[0]);
   if (!cleanedEmail) {
     toast("Nhập email trước nha.");
+    return false;
+  }
+  if (mode === "signup" && (!password || password.length < 6)) {
+    toast("Mật khẩu cần tối thiểu 6 ký tự.");
     return false;
   }
   state.commenterName = cleanedName;
@@ -1511,7 +1514,54 @@ async function sendLoginLink(email, displayName) {
     }
   });
   if (error) throw error;
-  toast("Đã gửi link đăng nhập. Mở email rồi bấm link xác nhận.");
+  pendingEmailOtp = {
+    email: cleanedEmail,
+    password: mode === "signup" ? password : "",
+    displayName: cleanedName,
+    mode
+  };
+  renderOtpModal();
+  toast("Đã gửi mã xác nhận qua email.");
+  return true;
+}
+
+async function verifyEmailOtp(token) {
+  if (!supabaseClient || !pendingEmailOtp) return false;
+  const cleanedToken = String(token || "").trim().replace(/\s+/g, "");
+  if (!cleanedToken) {
+    toast("Nhập mã xác nhận trước nha.");
+    return false;
+  }
+
+  const { data, error } = await supabaseClient.auth.verifyOtp({
+    email: pendingEmailOtp.email,
+    token: cleanedToken,
+    type: "email"
+  });
+  if (error) throw error;
+
+  authSession = data?.session || authSession;
+  authUser = data?.user || authSession?.user || authUser;
+  if (authUser) {
+    state.commenterName = pendingEmailOtp.displayName || accountDisplayName();
+    saveState();
+  }
+
+  if (pendingEmailOtp.mode === "signup" && pendingEmailOtp.password) {
+    const { error: passwordError } = await supabaseClient.auth.updateUser({
+      password: pendingEmailOtp.password,
+      data: { display_name: pendingEmailOtp.displayName }
+    });
+    if (passwordError) throw passwordError;
+  }
+
+  pendingEmailOtp = null;
+  await upsertProfile();
+  await loadVipEntitlement();
+  await loadAccountSummary();
+  renderAccount();
+  hydrateVisibleComments();
+  toast("Đã xác nhận email và đăng nhập.");
   return true;
 }
 
@@ -1587,6 +1637,14 @@ document.addEventListener("click", async (event) => {
     signOut();
   }
 
+  if (event.target.closest("[data-resend-otp]")) {
+    event.preventDefault();
+    const pending = pendingEmailOtp;
+    if (pending) {
+      await sendEmailOtp(pending.email, pending.displayName, pending.password, pending.mode);
+    }
+  }
+
   const unlockButton = event.target.closest("[data-unlock-chapter]");
   if (unlockButton) {
     event.preventDefault();
@@ -1635,6 +1693,26 @@ document.addEventListener("click", async (event) => {
 });
 
 document.addEventListener("submit", async (event) => {
+  const otpForm = event.target.closest("[data-otp-form]");
+  if (otpForm) {
+    event.preventDefault();
+    const button = otpForm.querySelector("button[type='submit']");
+    const originalLabel = button.textContent;
+    button.disabled = true;
+    button.textContent = "Đang xác nhận...";
+    try {
+      if (await verifyEmailOtp(otpForm.elements.token.value)) {
+        els.modal.hidden = true;
+      }
+    } catch {
+      toast("Mã xác nhận không đúng hoặc đã hết hạn.");
+    } finally {
+      button.disabled = false;
+      button.textContent = originalLabel;
+    }
+    return;
+  }
+
   const authForm = event.target.closest("[data-auth-form]");
   if (authForm) {
     event.preventDefault();
@@ -1647,16 +1725,14 @@ document.addEventListener("submit", async (event) => {
     const originalLabel = button.textContent;
     button.textContent = "Đang xử lý...";
     try {
-      const ok = action === "signup"
-        ? await signUpWithPassword(email, password, displayName)
-        : action === "magic"
-          ? await sendLoginLink(email, displayName)
-          : await signInWithPassword(email, password);
-      if (ok) {
+      const ok = action === "signup" || action === "otp"
+        ? await sendEmailOtp(email, displayName, password, action)
+        : await signInWithPassword(email, password);
+      if (ok && action === "signin") {
         els.modal.hidden = true;
       }
     } catch {
-      toast("Chưa xử lý được tài khoản. Kiểm tra email/mật khẩu hoặc xác nhận email.");
+      toast("Chưa xử lý được tài khoản. Kiểm tra email/mật khẩu hoặc thử lại sau.");
     } finally {
       button.disabled = false;
       button.textContent = originalLabel;
@@ -1829,10 +1905,14 @@ document.addEventListener("pause", (event) => {
 
 els.closeCheckout.addEventListener("click", () => {
   els.modal.hidden = true;
+  pendingEmailOtp = null;
 });
 
 els.modal.addEventListener("click", (event) => {
-  if (event.target === els.modal) els.modal.hidden = true;
+  if (event.target === els.modal) {
+    els.modal.hidden = true;
+    pendingEmailOtp = null;
+  }
 });
 
 els.search.addEventListener("input", () => {
