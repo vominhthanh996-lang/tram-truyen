@@ -32,6 +32,7 @@ const audioVoicePresets = [
 ];
 const audioSpeedOptions = [0.75, 0.9, 1, 1.15, 1.3, 1.5];
 const preferGeneratedMp3 = true;
+const EMAIL_OTP_EXPIRES_IN_MS = 20 * 60 * 1000;
 let state = loadState();
 let activeRouteHash = "";
 let speechState = {
@@ -1807,10 +1808,12 @@ function openAuthModal() {
 
 function renderOtpModal() {
   if (!pendingEmailOtp) return;
+  const expiresAt = pendingEmailOtp.expiresAt || Date.now();
+  const remainingMinutes = Math.max(0, Math.ceil((expiresAt - Date.now()) / 60000));
   els.checkout.innerHTML = `
     <span class="eyebrow">Xác nhận email</span>
     <h2 id="checkoutTitle">Nhập mã xác nhận</h2>
-    <p class="muted">Mã đã gửi tới ${escapeHtml(pendingEmailOtp.email)}. Kiểm tra Inbox và Spam/Quảng cáo nếu chưa thấy.</p>
+    <p class="muted">Mã đã gửi tới ${escapeHtml(pendingEmailOtp.email)} và chỉ có hiệu lực trong 20 phút. Còn khoảng ${remainingMinutes} phút. Kiểm tra Inbox và Spam/Quảng cáo nếu chưa thấy.</p>
     <form class="auth-form" data-otp-form>
       <label>
         <span>Mã xác nhận</span>
@@ -1868,10 +1871,11 @@ async function sendEmailOtp(email, displayName, password = "", mode = "signin") 
     email: cleanedEmail,
     password: mode === "signup" ? password : "",
     displayName: cleanedName,
-    mode
+    mode,
+    expiresAt: Date.now() + EMAIL_OTP_EXPIRES_IN_MS
   };
   renderOtpModal();
-  toast("Đã gửi mã xác nhận qua email.");
+  toast("Đã gửi mã xác nhận qua email. Mã có hiệu lực trong 20 phút.");
   return true;
 }
 
@@ -1880,6 +1884,11 @@ async function verifyEmailOtp(token) {
   const cleanedToken = String(token || "").trim().replace(/\s+/g, "");
   if (!cleanedToken) {
     toast("Nhập mã xác nhận trước nha.");
+    return false;
+  }
+  if (Date.now() > Number(pendingEmailOtp.expiresAt || 0)) {
+    renderOtpModal();
+    toast(`Mã xác nhận đã quá 20 phút. Bấm gửi lại mã cho ${pendingEmailOtp.email}.`);
     return false;
   }
 

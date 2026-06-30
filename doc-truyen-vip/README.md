@@ -43,6 +43,16 @@ window.SUPABASE_CONFIG = {
 
 Khi hai giá trị này có thật, web sẽ dùng Supabase REST API để đọc/ghi bình luận chung.
 
+## OTP Email 20 Phút
+
+Frontend đang giới hạn mã xác nhận email trong 20 phút. Để khóa thật ở server, vào Supabase Dashboard:
+
+1. `Authentication` -> `Providers` -> `Email`.
+2. Set `Email OTP Expiration` = `1200` giây.
+3. Save config.
+
+Nếu chỉ sửa frontend mà không set trên Supabase, người dùng bình thường sẽ thấy hết hạn sau 20 phút, nhưng server vẫn có thể chấp nhận mã theo cấu hình Supabase.
+
 ## Tạo Audio Edge Cho Chương
 
 Edge hiện có 2 giọng Việt thật, miễn phí và không cần API key:

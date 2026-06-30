@@ -17,6 +17,12 @@ Luon dung flow:
 5. Web goi `supabase.auth.verifyOtp({ type: "email" })`.
 6. Neu la tao account co mat khau, sau khi verify web goi `supabase.auth.updateUser({ password })`.
 
+Ma OTP phai het han trong 20 phut:
+
+- Frontend dang hien va tu choi verify ma cu qua 20 phut.
+- Trong Supabase Dashboard phai vao `Authentication` -> `Providers` -> `Email` va set `Email OTP Expiration` = `1200` giay.
+- Neu khong set tren Supabase, server van co the chap nhan OTP theo thoi gian mac dinh cua Supabase.
+
 Khi chua gan SMTP rieng, Supabase built-in email co the bi gioi han va co the vao Spam/Quang cao.
 Khi production that nen cau hinh SMTP rieng nhu Resend/Brevo, va domain gui mail co SPF/DKIM/DMARC de giam spam.
 
