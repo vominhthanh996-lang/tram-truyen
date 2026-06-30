@@ -317,10 +317,13 @@ async function initAuth() {
     renderAccount();
     return;
   }
+  handleAuthRedirectNotice();
   const { data } = await supabaseClient.auth.getSession();
   authSession = data?.session || null;
   authUser = authSession?.user || null;
   if (authUser) {
+    pendingEmailOtp = null;
+    els.modal.hidden = true;
     state.commenterName = accountDisplayName();
     saveState();
     await upsertProfile();
@@ -334,6 +337,8 @@ async function initAuth() {
     authSession = session || null;
     authUser = authSession?.user || null;
     if (authUser) {
+      pendingEmailOtp = null;
+      els.modal.hidden = true;
       state.commenterName = accountDisplayName();
       saveState();
       await upsertProfile();
@@ -344,6 +349,16 @@ async function initAuth() {
     renderAccount();
     hydrateVisibleComments();
   });
+}
+
+function handleAuthRedirectNotice() {
+  const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const errorCode = params.get("error_code");
+  if (!errorCode) return;
+  toast(errorCode === "otp_expired"
+    ? "Link xác nhận đã hết hạn. Bấm gửi lại email xác nhận."
+    : "Không xác nhận được email. Thử gửi lại link xác nhận.");
+  history.replaceState(null, "", `${location.pathname}${location.search}#/`);
 }
 
 function normalizeCatalogStory(story) {
@@ -1782,7 +1797,7 @@ function openAuthModal() {
   els.checkout.innerHTML = `
     <span class="eyebrow">Tài khoản</span>
     <h2 id="checkoutTitle">Đăng nhập Truyện 2K</h2>
-    <p class="muted">Tạo tài khoản bằng mã xác nhận email. Mã có thể bị giới hạn khi chưa gắn SMTP riêng.</p>
+    <p class="muted">Tạo tài khoản bằng email. Supabase sẽ gửi link xác nhận, bấm link trong email để hoàn tất.</p>
     <form class="auth-form" data-auth-form>
       <label>
         <span>Email</span>
@@ -1798,8 +1813,8 @@ function openAuthModal() {
       </label>
       <div class="auth-actions">
         <button class="btn btn-primary" type="submit" data-auth-action="signin">Đăng nhập</button>
-        <button class="btn btn-secondary" type="submit" data-auth-action="signup">Tạo tài khoản + gửi mã</button>
-        <button class="btn btn-secondary" type="submit" data-auth-action="otp">Gửi mã đăng nhập</button>
+        <button class="btn btn-secondary" type="submit" data-auth-action="signup">Tạo tài khoản + gửi link</button>
+        <button class="btn btn-secondary" type="submit" data-auth-action="otp">Gửi link/mã đăng nhập</button>
       </div>
     </form>
   `;
@@ -1812,8 +1827,8 @@ function renderOtpModal() {
   const remainingMinutes = Math.max(0, Math.ceil((expiresAt - Date.now()) / 60000));
   els.checkout.innerHTML = `
     <span class="eyebrow">Xác nhận email</span>
-    <h2 id="checkoutTitle">Nhập mã xác nhận</h2>
-    <p class="muted">Mã đã gửi tới ${escapeHtml(pendingEmailOtp.email)} và chỉ có hiệu lực trong 20 phút. Còn khoảng ${remainingMinutes} phút. Kiểm tra Inbox và Spam/Quảng cáo nếu chưa thấy.</p>
+    <h2 id="checkoutTitle">Mở email để xác nhận</h2>
+    <p class="muted">Link/mã xác nhận đã gửi tới ${escapeHtml(pendingEmailOtp.email)} và chỉ có hiệu lực trong 20 phút. Còn khoảng ${remainingMinutes} phút. Nếu email có nút Confirm, bấm nút đó; nếu email có mã số thì nhập mã bên dưới.</p>
     <form class="auth-form" data-otp-form>
       <label>
         <span>Mã xác nhận</span>
@@ -1821,7 +1836,7 @@ function renderOtpModal() {
       </label>
       <div class="auth-actions">
         <button class="btn btn-primary" type="submit">Xác nhận</button>
-        <button class="btn btn-secondary" type="button" data-resend-otp>Gửi lại mã</button>
+        <button class="btn btn-secondary" type="button" data-resend-otp>Gửi lại link/mã</button>
         <button class="btn btn-secondary" type="button" data-open-auth>Đổi email</button>
       </div>
     </form>
@@ -1873,24 +1888,34 @@ async function sendEmailOtp(email, displayName, password = "", mode = "signin") 
   }
   state.commenterName = cleanedName;
   saveState();
-  const { error } = await supabaseClient.auth.signInWithOtp({
-    email: cleanedEmail,
-    options: {
-      shouldCreateUser: true,
-      data: { display_name: cleanedName },
-      emailRedirectTo: `${location.origin}${location.pathname}`
-    }
-  });
+  const redirectTo = `${location.origin}${location.pathname}`;
+  const { error } = mode === "signup"
+    ? await supabaseClient.auth.signUp({
+      email: cleanedEmail,
+      password,
+      options: {
+        data: { display_name: cleanedName },
+        emailRedirectTo: redirectTo
+      }
+    })
+    : await supabaseClient.auth.signInWithOtp({
+      email: cleanedEmail,
+      options: {
+        shouldCreateUser: true,
+        data: { display_name: cleanedName },
+        emailRedirectTo: redirectTo
+      }
+    });
   if (error) throw error;
   pendingEmailOtp = {
     email: cleanedEmail,
-    password: mode === "signup" ? password : "",
+    password: "",
     displayName: cleanedName,
     mode,
     expiresAt: Date.now() + EMAIL_OTP_EXPIRES_IN_MS
   };
   renderOtpModal();
-  toast("Đã gửi mã xác nhận qua email. Mã có hiệu lực trong 20 phút.");
+  toast("Đã gửi link/mã xác nhận qua email. Hiệu lực trong 20 phút.");
   return true;
 }
 
