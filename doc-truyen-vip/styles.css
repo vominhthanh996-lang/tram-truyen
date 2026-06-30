@@ -1369,6 +1369,16 @@ body {
   color: #99f6e4;
 }
 
+.hero-main.image-hero {
+  background-position: center;
+  background-size: cover;
+}
+
+.hero-main.image-hero::before,
+.hero-main.image-hero::after {
+  content: none;
+}
+
 .hero h1,
 .page-title h1 {
   font-family: Georgia, "Times New Roman", serif;

@@ -987,7 +987,9 @@ function coverStyle(cover, overlay = "card") {
   const value = normalizeText(cover).trim();
   if (!value) return "background:linear-gradient(145deg, #d9f99d, #16a34a 45%, #111827)";
   if (!isImageCover(value)) return `background:${escapeHtml(value)}`;
-  const shade = overlay === "detail"
+  const shade = overlay === "hero"
+    ? "linear-gradient(90deg, rgba(9, 13, 24, 0.92), rgba(9, 13, 24, 0.70) 48%, rgba(9, 13, 24, 0.18))"
+    : overlay === "detail"
     ? "linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.62))"
     : "linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.68))";
   return `background-image:${shade},url('${cssString(value)}');background-size:cover;background-position:center`;
@@ -1111,7 +1113,7 @@ function renderHome() {
 
   els.view.innerHTML = `
     <section class="hero">
-      <div class="hero-main">
+      <div class="hero-main image-hero" style="${coverStyle(lastStory.cover, "hero")}">
         <span class="eyebrow">Truyện phế thổ đang đăng</span>
         <h1>Phế Thổ: Ta Nhặt Được Cả Thế Giới</h1>
         <p>Thư viện đọc truyện tiếng Việt có dấu, tối ưu cho đọc dài, có phần nghe audio và lưu chương đang đọc. Hiện tại toàn bộ chương được mở miễn phí.</p>
