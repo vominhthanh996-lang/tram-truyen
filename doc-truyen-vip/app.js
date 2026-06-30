@@ -320,6 +320,7 @@ async function initAuth() {
     renderAccount();
     return;
   }
+  const hadAuthRedirect = isAuthRedirectHash();
   handleAuthRedirectNotice();
   const { data } = await supabaseClient.auth.getSession();
   authSession = data?.session || null;
@@ -330,6 +331,7 @@ async function initAuth() {
     state.commenterName = accountDisplayName();
     saveState();
     await upsertProfile();
+    finishAuthRedirect(hadAuthRedirect);
   }
   await loadVipEntitlement();
   await loadAccountSummary();
@@ -345,6 +347,7 @@ async function initAuth() {
       state.commenterName = accountDisplayName();
       saveState();
       await upsertProfile();
+      finishAuthRedirect(isAuthRedirectHash());
     }
     await loadVipEntitlement();
     await loadAccountSummary();
@@ -352,6 +355,28 @@ async function initAuth() {
     renderAccount();
     hydrateVisibleComments();
   });
+}
+
+function isAuthRedirectHash(hashValue = location.hash) {
+  const hash = normalizeText(hashValue).replace(/^#/, "");
+  if (!hash || hash.startsWith("/")) return false;
+  const params = new URLSearchParams(hash);
+  return (
+    params.has("access_token") ||
+    params.has("refresh_token") ||
+    params.has("token_hash") ||
+    params.has("type") ||
+    params.has("code") ||
+    params.has("error") ||
+    params.has("error_code") ||
+    /^[A-Za-z0-9_-]{20,}$/.test(hash)
+  );
+}
+
+function finishAuthRedirect(shouldRedirect) {
+  if (!shouldRedirect) return;
+  toast("Xác nhận email thành công. Tài khoản đã đăng nhập.");
+  history.replaceState(null, "", `${location.pathname}${location.search}#/account`);
 }
 
 function handleAuthRedirectNotice() {
@@ -2170,6 +2195,10 @@ function toast(message) {
 
 async function route() {
   const hash = location.hash.replace(/^#/, "") || "/";
+  if (isAuthRedirectHash()) {
+    els.view.innerHTML = emptyState("Đang xác nhận email, chờ một chút nha...");
+    return;
+  }
   const shouldScrollTop = hash !== activeRouteHash;
   if (shouldScrollTop) stopSpeech();
   activeRouteHash = hash;
