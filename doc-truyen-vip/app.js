@@ -38,6 +38,9 @@ const preferGeneratedMp3 = true;
 const EMAIL_OTP_EXPIRES_IN_MS = 20 * 60 * 1000;
 let state = loadState();
 let activeRouteHash = "";
+let audioManifestLoaded = false;
+let audioManifestFailed = false;
+const audioManifestUrls = new Map();
 let speechState = {
   key: "",
   chunks: [],
@@ -357,10 +360,22 @@ async function initAuth() {
   });
 }
 
-function isAuthRedirectHash(hashValue = location.hash) {
+function authRedirectParams(hashValue = location.hash, searchValue = location.search) {
+  const params = new URLSearchParams(normalizeText(searchValue).replace(/^\?/, ""));
   const hash = normalizeText(hashValue).replace(/^#/, "");
-  if (!hash || hash.startsWith("/")) return false;
-  const params = new URLSearchParams(hash);
+  if (hash && !hash.startsWith("/")) {
+    const hashParams = new URLSearchParams(hash);
+    hashParams.forEach((value, key) => params.set(key, value));
+    if (/^[A-Za-z0-9_-]{20,}$/.test(hash) && !params.has("token_hash")) {
+      params.set("token_hash", hash);
+    }
+  }
+  return params;
+}
+
+function isAuthRedirectHash(hashValue = location.hash, searchValue = location.search) {
+  const hash = normalizeText(hashValue).replace(/^#/, "");
+  const params = authRedirectParams(hashValue, searchValue);
   return (
     params.has("access_token") ||
     params.has("refresh_token") ||
@@ -369,24 +384,24 @@ function isAuthRedirectHash(hashValue = location.hash) {
     params.has("code") ||
     params.has("error") ||
     params.has("error_code") ||
-    /^[A-Za-z0-9_-]{20,}$/.test(hash)
+    (hash && !hash.startsWith("/") && params.has("token_hash"))
   );
 }
 
 function finishAuthRedirect(shouldRedirect) {
   if (!shouldRedirect) return;
   toast("Xác nhận email thành công. Tài khoản đã đăng nhập.");
-  history.replaceState(null, "", `${location.pathname}${location.search}#/account`);
+  history.replaceState(null, "", `${location.pathname}#/account`);
 }
 
 function handleAuthRedirectNotice() {
-  const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const params = authRedirectParams();
   const errorCode = params.get("error_code");
   if (!errorCode) return;
   toast(errorCode === "otp_expired"
     ? "Link xác nhận đã hết hạn. Bấm gửi lại email xác nhận."
     : "Không xác nhận được email. Thử gửi lại link xác nhận.");
-  history.replaceState(null, "", `${location.pathname}${location.search}#/`);
+  history.replaceState(null, "", `${location.pathname}#/`);
 }
 
 function normalizeCatalogStory(story) {
@@ -491,8 +506,27 @@ function audioKey(storyId, chapterId) {
 
 function chapterAudioUrl(chapter, voiceId = selectedAudioVoice()) {
   if (!preferGeneratedMp3) return "";
+  const manifestUrl = audioManifestUrls.get(`${chapter.id}:${voiceId}`);
+  if (manifestUrl) return manifestUrl;
+  if (audioManifestLoaded) return "";
   const urls = chapter.audioUrls || {};
   return urls[voiceId] || (voiceId === "nu-cam-xuc" ? chapter.audioUrl || chapter.audio || "" : "");
+}
+
+async function loadAudioManifest() {
+  if (!preferGeneratedMp3) return;
+  try {
+    const response = await fetch(`audio/verified-audio.json?v=20260630-audio-manifest`, { cache: "no-store" });
+    if (!response.ok) throw new Error(`audio manifest ${response.status}`);
+    const payload = await response.json();
+    (payload.files || []).forEach((item) => {
+      if (!item.verified || item.provider !== "edge" || !item.chapterId || !item.preset || !item.file) return;
+      audioManifestUrls.set(`${item.chapterId}:${item.preset}`, `audio/${item.file}`);
+    });
+    audioManifestLoaded = true;
+  } catch {
+    audioManifestFailed = true;
+  }
 }
 
 function splitSpeechChunks(chapter) {
@@ -2655,5 +2689,5 @@ getSpeech()?.addEventListener?.("voiceschanged", () => {
 
 renderAccount();
 route();
-Promise.all([loadStoryCatalog(), initAuth()])
+Promise.all([loadStoryCatalog(), initAuth(), loadAudioManifest()])
   .finally(() => route());
