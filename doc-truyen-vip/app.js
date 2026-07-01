@@ -722,6 +722,61 @@ function currentGeneratedAudio() {
   return document.querySelector("[data-generated-audio]");
 }
 
+function readerContextFromAudio(audio) {
+  const panel = audio?.closest?.("[data-audio-panel]");
+  const [storyId, chapterId] = String(panel?.dataset.audioPanel || "").split(":");
+  const story = getStory(storyId);
+  const index = story?.chapters.findIndex((chapter) => chapter.id === chapterId) ?? -1;
+  const next = index >= 0 ? story.chapters[index + 1] : null;
+  return { story, chapterId, next };
+}
+
+function waitForNextGeneratedAudio(previousSrc, timeoutMs = 5000) {
+  const startedAt = Date.now();
+  return new Promise((resolve) => {
+    const tick = () => {
+      const audio = currentGeneratedAudio();
+      const src = audio?.currentSrc || audio?.src || "";
+      if (audio && src && src !== previousSrc) {
+        resolve(audio);
+        return;
+      }
+      if (Date.now() - startedAt >= timeoutMs) {
+        resolve(audio && src ? audio : null);
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+}
+
+async function autoPlayNextChapterAudio(audio) {
+  const previousSrc = audio?.currentSrc || audio?.src || "";
+  const { story, next } = readerContextFromAudio(audio);
+  if (!story || !next) {
+    updateAudioStatus("Đã nghe hết MP3.");
+    return;
+  }
+
+  updateAudioStatus("Đã nghe hết chương. Đang chuyển sang chương sau...");
+  location.hash = `#/read/${story.id}/${next.id}`;
+  const nextAudio = await waitForNextGeneratedAudio(previousSrc);
+  if (!nextAudio) {
+    updateAudioStatus("Đã sang chương sau, nhưng chương này chưa có MP3 cho giọng đang chọn.");
+    return;
+  }
+
+  nextAudio.playbackRate = selectedAudioSpeed();
+  try {
+    await nextAudio.play();
+    updateAudioStatus(`Đang tự phát chương sau ở tốc độ ${selectedAudioSpeed()}x.`);
+    startAudioProgressLoop(nextAudio);
+  } catch {
+    updateAudioStatus("Đã sang chương sau. Bấm Nghe chương để phát tiếp.");
+  }
+}
+
 function updateGeneratedAudioProgress(audio) {
   if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
   const percent = Math.min(100, Math.max(0, (audio.currentTime / audio.duration) * 100));
@@ -2649,12 +2704,11 @@ document.addEventListener("loadedmetadata", (event) => {
   updateGeneratedAudioProgress(audio);
 }, true);
 
-document.addEventListener("ended", (event) => {
+document.addEventListener("ended", async (event) => {
   const audio = event.target.closest?.("[data-generated-audio]");
   if (!audio) return;
   updateAudioProgress(100, "100%");
-  const nextLink = document.querySelector("[data-audio-next]");
-  updateAudioStatus(nextLink ? "Đã nghe hết MP3. Bấm Chương sau để nghe tiếp." : "Đã nghe hết MP3.");
+  await autoPlayNextChapterAudio(audio);
 }, true);
 
 document.addEventListener("play", (event) => {
